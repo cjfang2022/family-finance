@@ -94,29 +94,19 @@
             <!-- 🤖 AI 智慧記帳 -->
             <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 shadow-sm border border-indigo-100">
                 <h2 class="font-bold text-sm text-indigo-600 mb-1">🤖 AI 智慧記帳</h2>
-                <p class="text-[10px] text-slate-400 mb-2">輸入文字或按🎤說話，例如「牛排$120」「搭高鐵1490」「薪資5萬」</p>
+                <p class="text-[10px] text-slate-400 mb-2">輸入文字、按🎤說話、或📷拍照，自動拆成多筆！<br>例如「牛排120水果50搭高鐵1490薪水5萬」</p>
                 <div class="flex space-x-2">
                     <div class="flex-1 relative">
-                        <input type="text" id="ai-input" placeholder="說或輸入文字..." onkeydown="if(event.key==='Enter')parseAIInput()" class="w-full px-3 py-2.5 rounded-lg border border-indigo-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300 pr-10">
+                        <input type="text" id="ai-input" placeholder="說或輸入文字，支援多筆..." onkeydown="if(event.key==='Enter')parseAIInput()" class="w-full px-3 py-2.5 rounded-lg border border-indigo-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300 pr-10">
                         <button id="ai-mic-btn" onclick="startAIVoice()" class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-500 transition text-sm">🎤</button>
                     </div>
-                    <button onclick="parseAIInput()" class="touch-btn px-4 py-2.5 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">🤖 記帳</button>
+                    <button onclick="parseAIInput()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">🤖 記帳</button>
+                    <button onclick="document.getElementById('ai-cam-input').click()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-purple-600 hover:bg-purple-700 shadow-sm active:scale-[0.98] transition">📷</button>
                 </div>
-                <!-- 預覽 -->
-                <div id="ai-preview" class="hidden mt-2 bg-white rounded-lg p-2.5 border border-indigo-100 shadow-sm">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-1.5 min-w-0">
-                            <span id="ai-preview-type" class="text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
-                            <span id="ai-preview-cat" class="text-xs font-medium text-slate-600"></span>
-                            <span id="ai-preview-amount" class="text-sm font-black"></span>
-                        </div>
-                        <div class="flex space-x-1.5 shrink-0">
-                            <button onclick="confirmAI()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold active:bg-emerald-200 transition">✅ 確認</button>
-                            <button onclick="clearAI()" class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-[10px] active:bg-slate-200 transition">✕</button>
-                        </div>
-                    </div>
-                    <p id="ai-preview-note" class="text-[9px] text-slate-400 mt-1"></p>
-                </div>
+                <input type="file" id="ai-cam-input" accept="image/*" capture="environment" class="hidden" onchange="ocrImage(this)">
+                <div id="ai-ocr-loading" class="hidden mt-2 bg-purple-50 rounded-lg p-2.5 text-[10px] text-purple-600 text-center">🔍 OCR 辨識中...</div>
+                <!-- 多筆預覽 -->
+                <div id="ai-preview" class="hidden mt-2 space-y-1.5"></div>
             </div>
             <!-- 手動新增區 -->
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
@@ -687,122 +677,170 @@
             el._timer = setTimeout(() => { el.classList.add('opacity-0', 'scale-90'); el.classList.remove('opacity-100', 'scale-100'); }, 2200);
         }
 
-        // ====== 🤖 AI 智慧記帳 ======
-        let _aiResult = null; // { type, category, amount, note }
+        // ====== 🤖 AI 智慧記帳（多筆 + 語音 + OCR） ======
+        let _aiResults = []; // [{ type, category, amount, note }, ...]
+        let _confirmedCount = 0;
 
         function parseAIInput() {
             const raw = document.getElementById('ai-input').value.trim();
             if (!raw) { showToast('請輸入或說話'); return; }
-            _aiResult = aiParseNatural(raw);
-            renderAIPreview(_aiResult, raw);
+            _aiResults = aiParseMulti(raw);
+            renderAIPreview();
         }
 
-        function aiParseNatural(text) {
-            // 1) 抽數字：第一個數字，支援 1000、1,000、1.5k、5萬
-            let amount = 0;
-            let amountStr = '';
-            const numMatch = text.match(/(\d[\d,]*\.?\d*)\s*(k|千|萬|百)?/i);
-            if (numMatch) {
-                let n = parseFloat(numMatch[1].replace(/,/g, ''));
-                const unit = (numMatch[2] || '').toLowerCase();
-                if (unit === 'k' || unit === '千') n *= 1000;
-                else if (unit === '萬') n *= 10000;
-                else if (unit === '百') n *= 100;
-                amount = n;
-                amountStr = numMatch[0];
+        /** 將整段文字拆成多筆，每筆是「品項+金額」 */
+        function aiParseMulti(text) {
+            // Step 1: 用 數字 當分隔點，把文字拆成 (中文/品項, 數字) 配對
+            // 支援格式：牛排120、牛排 120、牛排$120、水果50、搭高鐵1490
+            const segments = [];
+            // 正則：匹配任何「非數字字串 + 數字」的組合，從頭吃到尾
+            // 用 lookahead 找每個 (中文+數字) 配對
+            const regex = /([\u4e00-\u9fff\w\s]+?)\s*[\$¥]?\s*(\d[\d,]*\.?\d*)\s*(k|千|萬|百)?/gi;
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                let name = match[1].trim().replace(/[＋\+$]/g, '').trim();
+                let amount = parseFloat(match[2].replace(/,/g, ''));
+                const unit = (match[3] || '').toLowerCase();
+                if (unit === 'k' || unit === '千') amount *= 1000;
+                else if (unit === '萬') amount *= 10000;
+                else if (unit === '百') amount *= 100;
+                if (!name) name = '項目';
+                segments.push({ name, amount });
             }
 
-            // 2) 判斷 type：包含收入關鍵字 → income
+            // 如果正則沒找到，退回到原本的單筆模式
+            if (segments.length === 0) {
+                const single = aiParseSingle(text);
+                if (single) segments.push(single);
+            }
+
+            // Step 2: 每個 segment 套用分類
+            return segments.map(s => {
+                const result = classifyItem(s.name, s.amount);
+                return {
+                    type: result.type,
+                    category: result.category,
+                    amount: s.amount,
+                    note: s.name,
+                    _key: Math.random().toString(36).slice(2, 8)
+                };
+            });
+        }
+
+        /** 單筆解析（舊版邏輯） */
+        function aiParseSingle(text) {
+            const numMatch = text.match(/(\d[\d,]*\.?\d*)\s*(k|千|萬|百)?/i);
+            if (!numMatch) return null;
+            let amount = parseFloat(numMatch[1].replace(/,/g, ''));
+            const unit = (numMatch[2] || '').toLowerCase();
+            if (unit === 'k' || unit === '千') amount *= 1000;
+            else if (unit === '萬') amount *= 10000;
+            else if (unit === '百') amount *= 100;
+
+            let name = text.replace(numMatch[0], '').replace(/[＋\+$]/g, '').trim();
+            if (!name) name = amount >= 10000 ? '收入' : '支出';
+            const r = classifyItem(name, amount);
+            return { name, amount: r.type === 'income' ? amount : amount };
+        }
+
+        /** 根據品項名稱判斷收入/支出 + 分類 */
+        function classifyItem(name, amount) {
             const incomeKeywords = ['薪資','薪水','工資','獎金','年終','分紅','投資','股息','利息','股利','租金','兼職','接案','收入','紅包','禮金'];
-            const isIncome = incomeKeywords.some(k => text.includes(k));
+            const isIncome = incomeKeywords.some(k => name.includes(k));
             const type = isIncome ? 'income' : 'expense';
 
-            // 3) 分類匹配
-            let matchedCat = '';
-            // 先比對支出（使用者自訂分類 + 內建關鍵字）
             const catMap = {
-                // 支出關鍵字 → 分類
-                '餐飲|外食|牛排|便當|麵|飯|火鍋|燒烤|早餐|午餐|晚餐|宵夜|飲料|咖啡|手搖|麥當勞|肯德基|subway|爭鮮|吃到飽|小吃|餐廳|美食|速食|日料|壽司|拉麵|滷味|鹹酥雞|雞排|珍奶|豆漿|饅頭|漢堡|pizza|披薩': '餐飲/外食',
-                '超市|全聯|家樂福|costco|好市多|頂好|菜市場|買菜|購物|日用品|雜貨|蝦皮|pchome|網購|團購|採買': '日常採買',
-                '交通|高鐵|台鐵|捷運|公車|ubike|youbike|計程車|uber|taxi|機車|汽車|加油|停車|過路費|etc|月票|車票': '交通',
+                '餐飲|外食|牛排|便當|麵|飯|火鍋|燒烤|早餐|午餐|晚餐|宵夜|飲料|咖啡|手搖|麥當勞|肯德基|subway|爭鮮|吃到飽|小吃|餐廳|美食|速食|日料|壽司|拉麵|滷味|鹹酥雞|雞排|珍奶|豆漿|饅頭|漢堡|pizza|披薩|蘋果|水果|魚肉|肉': '餐飲/外食',
+                '超市|全聯|家樂福|costco|好市多|頂好|菜市場|買菜|購物|日用品|雜貨|蝦皮|pchome|網購|團購|採買|衛生紙|洗髮精|沐浴乳|洗衣': '日常採買',
+                '交通|高鐵|台鐵|捷運|公車|ubike|youbike|計程車|uber|taxi|機車|汽車|加油|停車|過路費|etc|月票|車票|油錢': '交通',
                 '水電|電費|水費|瓦斯|天然氣|管理費|第四台|網路費|房租|房貸|租屋|住宿|旅館': '居住/水電',
-                '娛樂|電影|Netflix|Spotify|遊戲|steam|手遊|課金|演唱會|KTV|遊樂園|旅遊|住宿|飯店|露營|滑雪|潛水': '娛樂',
-                '醫療|掛號|診所|醫院|藥局|看醫生|牙醫|眼科|中醫|復健|健檢|檢查|疫苗': '醫療',
-                '教育|學費|補習|課程|線上課程|書|參考書|家教': '教育',
+                '娛樂|電影|netflix|spotify|遊戲|steam|手遊|課金|演唱會|ktv|遊樂園|旅遊|露營|滑雪|潛水': '娛樂',
+                '醫療|掛號|診所|醫院|藥局|看醫生|牙醫|眼科|中醫|復健|健檢|檢查|疫苗|藥': '醫療',
+                '教育|學費|補習|課程|線上課程|書|參考書|家教|文具': '教育',
                 '通訊|手機|電信|月租費|通話費|上網': '通訊',
-                '保險|勞保|健保|壽險|醫療險|車險|保費': '保險',
-                '捐款|紅包|禮物|送禮|賀禮|奠儀|喜宴|紅白包|交際|應酬|聚餐|同事': '其他支出'
+                '保險|勞保|健保|壽險|醫療險|車險|保費': '保險'
             };
             const incomeCatMap = {
                 '薪資|薪水|月薪|底薪': '薪資',
                 '獎金|年終|分紅|績效|三節': '獎金',
-                '投資|股息|股利|利息|股票|基金': '投資收益',
-                '兼職|接案|freelance|打工|時薪': '兼職收入',
+                '投資|股息|股利|利息|股票|基金|配息': '投資收益',
+                '兼職|接案|freelance|打工|時薪|外送': '兼職收入',
                 '租金|房租收入|出租': '兼職收入',
-                '紅包|禮金|過年': '紅包/禮金'
+                '紅包|禮金|過年|壓歲錢': '紅包/禮金'
             };
 
             const map = type === 'income' ? incomeCatMap : catMap;
-            for (const [pattern, cat] of Object.entries(map)) {
-                if (new RegExp(pattern).test(text)) {
-                    matchedCat = cat;
-                    break;
-                }
+            let cat = '';
+            for (const [pattern, c] of Object.entries(map)) {
+                if (new RegExp(pattern, 'i').test(name)) { cat = c; break; }
             }
+            if (!cat) cat = CATEGORIES[type][0] || (type === 'income' ? '其他收入' : '其他支出');
 
-            // Fallback: 用第一個自訂分類，或設為「其他」
-            if (!matchedCat) {
-                matchedCat = CATEGORIES[type][0] || (type === 'income' ? '其他收入' : '其他支出');
-            }
-
-            // 4) 備註：從原文移除金額和分類關鍵字，保留剩餘文字
-            let note = text;
-            if (amountStr) note = note.replace(amountStr, '').trim();
-            // 移除非中文殘餘
-            note = note.replace(/[＋\+$]/g, '').trim();
-            // 如果什麼都不剩就用分類名
-            if (!note) note = type === 'income' ? '收入' : '支出';
-
-            return { type, category: matchedCat, amount, note };
+            return { type, category: cat };
         }
 
-        function renderAIPreview(r, raw) {
+        function renderAIPreview() {
             const el = document.getElementById('ai-preview');
+            if (!_aiResults.length) { el.classList.add('hidden'); return; }
             el.classList.remove('hidden');
 
-            const typeLabel = r.type === 'income' ? '💵 收入' : '💸 支出';
-            const typeColor = r.type === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
-            const amtColor = r.type === 'income' ? 'text-emerald-600' : 'text-rose-500';
+            const total = _aiResults.length;
+            let html = `<div class="bg-white rounded-lg p-2.5 border border-indigo-100 shadow-sm space-y-1.5">
+                <div class="flex justify-between items-center">
+                    <span class="text-[11px] font-bold text-slate-600">📋 共 ${total} 筆</span>
+                    <div class="flex space-x-1.5">
+                        <button onclick="confirmAllAI()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold active:bg-emerald-200 transition">✅ 全部確認送出</button>
+                        <button onclick="clearAI()" class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-[10px] active:bg-slate-200 transition">✕</button>
+                    </div>
+                </div>`;
 
-            document.getElementById('ai-preview-type').textContent = typeLabel;
-            document.getElementById('ai-preview-type').className = `text-[10px] font-bold px-1.5 py-0.5 rounded ${typeColor}`;
-            document.getElementById('ai-preview-cat').textContent = r.category;
-            document.getElementById('ai-preview-amount').textContent = (r.type === 'income' ? '+' : '-') + '$' + r.amount.toLocaleString();
-            document.getElementById('ai-preview-amount').className = `text-sm font-black ${amtColor}`;
-            document.getElementById('ai-preview-note').textContent = '📝 ' + r.note;
+            _aiResults.forEach((r, i) => {
+                const icon = r.type === 'income' ? '💵' : '💸';
+                const color = r.type === 'income' ? 'text-emerald-600' : 'text-rose-500';
+                const typeLabel = r.type === 'income' ? '收入' : '支出';
+                const bgColor = r.type === 'income' ? 'bg-emerald-50' : 'bg-rose-50';
+                html += `<div class="${bgColor} rounded-lg px-2.5 py-1.5 flex items-center justify-between">
+                    <div class="flex items-center space-x-1.5 min-w-0">
+                        <span class="text-xs">${icon}</span>
+                        <span class="text-[10px] font-medium text-slate-500">${r.category}</span>
+                        <span class="text-[10px] text-slate-400 truncate">${r.note}</span>
+                    </div>
+                    <span class="text-xs font-bold ${color} shrink-0">${r.type === 'income' ? '+' : '-'}$${r.amount.toLocaleString()}</span>
+                </div>`;
+            });
+
+            html += '</div>';
+            el.innerHTML = html;
         }
 
         function clearAI() {
             document.getElementById('ai-preview').classList.add('hidden');
             document.getElementById('ai-input').value = '';
-            _aiResult = null;
+            _aiResults = [];
+            _confirmedCount = 0;
         }
 
-        async function confirmAI() {
-            if (!_aiResult || !_aiResult.amount || _aiResult.amount <= 0) { showToast('⚠️ 請先輸入正確金額'); return; }
-            try {
-                await apiPost('/api/transactions', {
-                    date: today(),
-                    type: _aiResult.type,
-                    category: _aiResult.category,
-                    amount: _aiResult.amount,
-                    note: _aiResult.note
-                });
-                showToast('✅ AI 已自動記帳！');
-                clearAI();
-                await loadFromCloud();
-                renderTxTable();
-            } catch(e) { showToast('⚠️ 失敗，請手動輸入'); }
+        async function confirmAllAI() {
+            const valid = _aiResults.filter(r => r.amount > 0);
+            if (!valid.length) { showToast('⚠️ 沒有有效項目'); return; }
+
+            let ok = 0, fail = 0;
+            for (const r of valid) {
+                try {
+                    await apiPost('/api/transactions', {
+                        date: today(),
+                        type: r.type,
+                        category: r.category,
+                        amount: r.amount,
+                        note: r.note
+                    });
+                    ok++;
+                } catch(e) { fail++; }
+            }
+            showToast(`✅ ${ok} 筆已送出${fail ? `，${fail} 筆失敗` : ''}`);
+            clearAI();
+            await loadFromCloud();
+            renderTxTable();
         }
 
         // ====== 🎤 語音輸入 ======
@@ -828,10 +866,10 @@
             _aiRecognition = rec;
 
             rec.onresult = (e) => {
-                const transcript = e.results[e.results.length - 1][0].transcript;
+                const last = e.results.length - 1;
+                const transcript = e.results[last][0].transcript;
                 document.getElementById('ai-input').value = transcript;
-                // 如果是最終結果，自動解析
-                if (e.results[e.results.length - 1].isFinal) {
+                if (e.results[last].isFinal) {
                     rec.stop();
                     parseAIInput();
                 }
@@ -851,6 +889,57 @@
             };
 
             try { rec.start(); } catch(_) { showToast('⚠️ 語音啟動失敗'); }
+        }
+
+        // ====== 📷 OCR 拍照辨識 ======
+        function ocrImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            document.getElementById('ai-ocr-loading').classList.remove('hidden');
+
+            // 用 Tesseract.js CDN 做 OCR
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const imgData = e.target.result;
+                try {
+                    // 動態載入 Tesseract
+                    if (typeof Tesseract === 'undefined') {
+                        await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+                    }
+                    const { data } = await Tesseract.recognize(imgData, 'chi_tra', {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                const pct = Math.round(m.progress * 100);
+                                document.getElementById('ai-ocr-loading').textContent = `🔍 OCR 辨識中... ${pct}%`;
+                            }
+                        }
+                    });
+                    document.getElementById('ai-ocr-loading').classList.add('hidden');
+                    const text = data.text.trim();
+                    if (!text) { showToast('⚠️ 無法辨識內容'); return; }
+                    document.getElementById('ai-input').value = text;
+                    parseAIInput();
+                    showToast('✅ OCR 完成！');
+                } catch(err) {
+                    document.getElementById('ai-ocr-loading').classList.add('hidden');
+                    showToast('⚠️ OCR 失敗');
+                    console.error(err);
+                }
+            };
+            reader.readAsDataURL(file);
+            // Reset input so same file can be picked again
+            input.value = '';
+        }
+
+        function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = url;
+                s.onload = resolve;
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
         }
 
         // ====== 統整 ======
