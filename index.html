@@ -189,21 +189,22 @@
                 <h3 class="font-bold text-sm text-slate-600 mb-3">⚙️ 自訂分類（兩階）</h3>
                 <div class="space-y-3">
                     <div>
-                        <h4 class="text-[11px] font-bold text-emerald-600 mb-1.5">收入大類</h4>
-                        <div id="s-income-main" class="space-y-1.5 mb-2"></div>
+                        <h4 class="text-sm font-bold text-emerald-600 mb-2">💵 收入大類</h4>
+                        <div id="s-income-main" class="space-y-2 mb-2"></div>
                         <div class="flex space-x-1.5">
-                            <input id="s-new-income-main" placeholder="新增大類名稱" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
-                            <button onclick="addMainCat('income')" class="touch-btn px-3 py-2 bg-emerald-100 text-emerald-600 rounded-lg text-xs font-bold active:bg-emerald-200 transition">＋大類</button>
+                            <input id="s-new-income-main" placeholder="新增大類名稱" class="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-sm outline-none">
+                            <button onclick="addMainCat('income')" class="touch-btn px-3 py-2.5 bg-emerald-100 text-emerald-600 rounded-lg text-sm font-bold active:bg-emerald-200 transition">＋大類</button>
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-[11px] font-bold text-rose-600 mb-1.5">支出大類</h4>
-                        <div id="s-expense-main" class="space-y-1.5 mb-2"></div>
+                        <h4 class="text-sm font-bold text-rose-600 mb-2">💸 支出大類</h4>
+                        <div id="s-expense-main" class="space-y-2 mb-2"></div>
                         <div class="flex space-x-1.5">
-                            <input id="s-new-expense-main" placeholder="新增大類名稱" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
-                            <button onclick="addMainCat('expense')" class="touch-btn px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold active:bg-rose-200 transition">＋大類</button>
+                            <input id="s-new-expense-main" placeholder="新增大類名稱" class="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-sm outline-none">
+                            <button onclick="addMainCat('expense')" class="touch-btn px-3 py-2.5 bg-rose-100 text-rose-600 rounded-lg text-sm font-bold active:bg-rose-200 transition">＋大類</button>
                         </div>
                     </div>
+                    <button onclick="resetCategories()" class="touch-btn w-full py-2.5 rounded-lg font-bold text-sm text-amber-600 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 transition border border-amber-200">🔄 還原預設分類</button>
                 </div>
             </div>
             <!-- 🤖 AI 設定 -->
@@ -279,16 +280,17 @@
 
     <!-- Modal: 編輯大類細項 -->
     <div id="modal-subcats" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-4 pb-8 sm:pb-4 animate-in">
+        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-5 pb-8 sm:pb-5 animate-in">
             <div class="flex justify-center mb-3 sm:hidden"><div class="w-10 h-1 bg-slate-300 rounded-full"></div></div>
-            <h3 class="font-bold text-sm text-slate-700 mb-3" id="modal-subcats-title">編輯細項</h3>
-            <div id="modal-subcats-list" class="space-y-1.5 mb-3 max-h-52 overflow-y-auto"></div>
+            <h3 class="font-bold text-base text-slate-700 mb-3" id="modal-subcats-title">編輯細項</h3>
+            <p class="text-xs text-slate-400 mb-2">點選細項名稱可直接編輯，點 ✕ 刪除</p>
+            <div id="modal-subcats-list" class="space-y-2 mb-3 max-h-56 overflow-y-auto"></div>
             <div class="flex space-x-1.5">
-                <input id="modal-subcats-input" placeholder="新增細項" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
-                <button onclick="addSubCatFromModal()" class="touch-btn px-3 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold active:bg-indigo-200 transition">＋</button>
+                <input id="modal-subcats-input" placeholder="新增細項名稱" class="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-sm outline-none">
+                <button onclick="addSubCatFromModal()" class="touch-btn px-3 py-2.5 bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold active:bg-indigo-200 transition">＋</button>
             </div>
             <div class="flex space-x-2 mt-4">
-                <button onclick="closeModal('modal-subcats')" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">關閉</button>
+                <button onclick="closeModal('modal-subcats')" class="touch-btn flex-1 py-2.5 rounded-lg text-sm font-bold bg-slate-100 hover:bg-slate-200 transition">關閉</button>
             </div>
         </div>
     </div>
@@ -812,26 +814,26 @@
         function renderSettingsCats() {
             // 收入
             document.getElementById('s-income-main').innerHTML = Object.entries(CATEGORIES.income).map(([main, subs]) =>
-                '<div class="bg-slate-50 rounded-lg p-2">'
-                + '<div class="flex items-center justify-between mb-1">'
-                + '<span class="text-xs font-bold text-emerald-700">'+esc(main)+'</span>'
-                + '<div class="flex space-x-1">'
-                + '<button onclick="openSubCats(\'income\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded font-medium">✏️</button>'
-                + '<button onclick="removeMainCat(\'income\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-500 rounded font-medium">✕</button>'
+                '<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">'
+                + '<div class="flex items-center justify-between mb-1.5">'
+                + '<span class="text-sm font-bold text-emerald-700">'+esc(main)+'</span>'
+                + '<div class="flex space-x-1.5">'
+                + '<button onclick="openSubCats(\'income\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded-lg font-medium active:bg-indigo-200">✏️ 細項</button>'
+                + '<button onclick="removeMainCat(\'income\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-rose-100 text-rose-500 rounded-lg font-medium active:bg-rose-200">🗑️</button>'
                 + '</div></div>'
-                + '<div class="flex flex-wrap gap-1">'+subs.map(s => '<span class="text-[10px] px-1.5 py-0.5 bg-white rounded border">'+esc(s)+'</span>').join('')+'</div></div>'
+                + '<div class="flex flex-wrap gap-1.5">'+subs.map(s => '<span class="text-sm px-2 py-1 bg-white rounded-lg border border-slate-200 text-slate-600">'+esc(s)+'</span>').join('')+'</div></div>'
             ).join('');
 
             // 支出
             document.getElementById('s-expense-main').innerHTML = Object.entries(CATEGORIES.expense).map(([main, subs]) =>
-                '<div class="bg-slate-50 rounded-lg p-2">'
-                + '<div class="flex items-center justify-between mb-1">'
-                + '<span class="text-xs font-bold text-rose-700">'+esc(main)+'</span>'
-                + '<div class="flex space-x-1">'
-                + '<button onclick="openSubCats(\'expense\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-600 rounded font-medium">✏️</button>'
-                + '<button onclick="removeMainCat(\'expense\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-500 rounded font-medium">✕</button>'
+                '<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">'
+                + '<div class="flex items-center justify-between mb-1.5">'
+                + '<span class="text-sm font-bold text-rose-700">'+esc(main)+'</span>'
+                + '<div class="flex space-x-1.5">'
+                + '<button onclick="openSubCats(\'expense\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded-lg font-medium active:bg-indigo-200">✏️ 細項</button>'
+                + '<button onclick="removeMainCat(\'expense\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-rose-100 text-rose-500 rounded-lg font-medium active:bg-rose-200">🗑️</button>'
                 + '</div></div>'
-                + '<div class="flex flex-wrap gap-1">'+subs.map(s => '<span class="text-[10px] px-1.5 py-0.5 bg-white rounded border">'+esc(s)+'</span>').join('')+'</div></div>'
+                + '<div class="flex flex-wrap gap-1.5">'+subs.map(s => '<span class="text-sm px-2 py-1 bg-white rounded-lg border border-slate-200 text-slate-600">'+esc(s)+'</span>').join('')+'</div></div>'
             ).join('');
         }
         function addMainCat(type) {
@@ -843,7 +845,12 @@
             saveCats(); renderSettingsCats();
         }
         function removeMainCat(type, main) {
-            if (!confirm('確定刪除大類「'+main+'」及其細項？')) return;
+            const isDefault = DEFAULT_CATEGORIES[type] && DEFAULT_CATEGORIES[type][main];
+            if (isDefault) {
+                if (!confirm('⚠️ 這是預設分類！\n確定要刪除大類「'+main+'」及其所有細項？\n\n之後可點「🔄 還原預設分類」恢復。')) return;
+            } else {
+                if (!confirm('確定刪除大類「'+main+'」及其所有細項？')) return;
+            }
             delete CATEGORIES[type][main];
             saveCats(); renderSettingsCats();
         }
@@ -859,10 +866,23 @@
         function renderSubCatList() {
             const subs = getSubCats(_subCatType, _subCatMain);
             document.getElementById('modal-subcats-list').innerHTML = subs.map((s, i) =>
-                '<div class="flex items-center justify-between bg-slate-50 rounded-lg px-2.5 py-1.5">'
-                + '<span class="text-xs">'+esc(s)+'</span>'
-                + '<button onclick="removeSubCat('+i+')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-500 rounded font-medium">✕</button></div>'
+                '<div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5 border border-slate-100">'
+                + '<input type="text" id="subcat-input-'+i+'" value="'+escAttr(s)+'" class="flex-1 text-sm bg-transparent outline-none border-none text-slate-700 focus:font-medium" onchange="renameSubCat('+i+')">'
+                + '<button onclick="removeSubCat('+i+')" class="touch-btn text-sm px-2 py-1 bg-rose-100 text-rose-500 rounded-lg font-medium active:bg-rose-200 shrink-0 ml-2">✕</button></div>'
             ).join('');
+        }
+        function renameSubCat(idx) {
+            const newName = document.getElementById('subcat-input-'+idx).value.trim();
+            if (!newName) return;
+            const oldName = CATEGORIES[_subCatType][_subCatMain][idx];
+            if (newName === oldName) return;
+            if (CATEGORIES[_subCatType][_subCatMain].includes(newName)) {
+                showToast('⚠️ 細項名稱重複');
+                document.getElementById('subcat-input-'+idx).value = oldName;
+                return;
+            }
+            CATEGORIES[_subCatType][_subCatMain][idx] = newName;
+            saveCatsDelayed();
         }
         function addSubCatFromModal() {
             const v = document.getElementById('modal-subcats-input').value.trim();
@@ -873,9 +893,26 @@
             saveCatsDelayed();
         }
         function removeSubCat(idx) {
+            const subName = CATEGORIES[_subCatType][_subCatMain][idx];
+            const isDefault = DEFAULT_CATEGORIES[_subCatType]?.[_subCatMain]?.includes(subName);
+            if (isDefault) {
+                if (!confirm('⚠️ 這是預設細項！\n確定要刪除「'+subName+'」？\n\n之後可點「🔄 還原預設分類」恢復。')) return;
+            } else {
+                if (!confirm('確定刪除細項「'+subName+'」？')) return;
+            }
             CATEGORIES[_subCatType][_subCatMain].splice(idx, 1);
             renderSubCatList();
             saveCatsDelayed();
+        }
+        function resetCategories() {
+            if (!confirm('⚠️ 確定要還原為預設分類？\n所有自訂的大類和細項將被清除！')) return;
+            if (!confirm('再次確認！將清除所有自訂分類，還原為系統預設。')) return;
+            CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+            saveCats();
+            renderSettingsCats();
+            // 也更新記帳頁的分類選單
+            renderTxCats();
+            showToast('✅ 已還原為預設分類');
         }
         let _saveCatsTimer = null;
         function saveCatsDelayed() {
