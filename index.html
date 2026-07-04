@@ -218,6 +218,7 @@
                         <label class="text-[10px] text-slate-400">狀態</label>
                         <span id="ai-status" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-500">未啟用</span>
                     </div>
+                    <div id="ai-status-detail" class="hidden text-[10px] text-rose-600 bg-rose-50 rounded-lg px-2.5 py-2 leading-relaxed break-words"></div>
                     <div>
                         <label class="text-[10px] text-slate-400">Gemini API Key</label>
                         <div class="flex space-x-1.5 mt-1">
@@ -882,8 +883,10 @@
             const key = document.getElementById('s-gemini-key').value.trim();
             if (!key) { showToast('請先輸入 API Key'); return; }
             const statusEl = document.getElementById('ai-status');
+            const detailEl = document.getElementById('ai-status-detail');
             statusEl.textContent = '🔌 測試中...';
             statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-100 text-amber-600';
+            detailEl.classList.add('hidden');
             try {
                 const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
                     method: 'POST',
@@ -894,16 +897,21 @@
                 if (r.ok && data?.candidates) {
                     statusEl.textContent = '✅ 連線成功！API Key 可用';
                     statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600';
+                    detailEl.classList.add('hidden');
                     localStorage.setItem('famt_gemini_key', key);
                 } else {
                     const err = data?.error?.message || data?.error?.status || JSON.stringify(data);
-                    statusEl.textContent = '❌ ' + err.slice(0, 60);
+                    statusEl.textContent = '❌ API 錯誤';
                     statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-rose-100 text-rose-600';
+                    detailEl.textContent = err;
+                    detailEl.classList.remove('hidden');
                     console.error('Gemini API error:', data);
                 }
             } catch(e) {
-                statusEl.textContent = '❌ 網路錯誤：' + e.message.slice(0, 40);
+                statusEl.textContent = '❌ 網路錯誤';
                 statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-rose-100 text-rose-600';
+                detailEl.textContent = e.message;
+                detailEl.classList.remove('hidden');
                 console.error('Gemini test failed:', e);
             }
         }
