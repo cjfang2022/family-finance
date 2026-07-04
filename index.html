@@ -42,10 +42,10 @@
                 </div>
             </div>
             <div class="flex items-center space-x-1 text-[10px] shrink-0">
-                <span id="sync-badge" class="bg-white/20 px-2 py-1 rounded-lg flex items-center space-x-0.5">
+                <button onclick="manualSync()" class="bg-white/20 hover:bg-white/30 active:scale-90 transition px-2 py-1 rounded-lg flex items-center space-x-0.5">
                     <span id="sync-icon">⏳</span>
                     <span id="sync-label" class="hidden sm:inline">連線中</span>
-                </span>
+                </button>
             </div>
         </div>
     </header>
@@ -409,6 +409,23 @@
         function setSync(ok) {
             document.getElementById('sync-icon').textContent = ok ? '☁️' : '⚠️';
             document.getElementById('sync-label').textContent = ok ? '已連線' : '離線';
+        }
+
+        /** 手動同步按鈕：強制重新載入雲端資料 */
+        async function manualSync() {
+            const btn = document.querySelector('#sync-icon').parentElement;
+            btn.classList.add('pointer-events-none', 'opacity-60');
+            document.getElementById('sync-icon').textContent = '⏳';
+            try {
+                await loadFromCloud();
+                const currentTab = document.querySelector('.tab-content.active')?.id?.replace('content-', '') || 'dashboard';
+                switchTab(currentTab);
+                showToast('✅ 已同步');
+            } catch(e) {
+                showToast('⚠️ 同步失敗');
+            } finally {
+                btn.classList.remove('pointer-events-none', 'opacity-60');
+            }
         }
 
         // ====== 頁籤 ======
