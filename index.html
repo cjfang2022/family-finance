@@ -424,7 +424,8 @@
                 const s = await apiGet('/api/settings');
                 if (s.data && s.data.categories) {
                     const c = s.data.categories;
-                    if (c && typeof c === 'object' && c.income && c.expense) {
+                    // 檢查是否為兩階格式：income 是物件（有大類名稱當 key）而不是陣列
+                    if (c && typeof c === 'object' && !Array.isArray(c.income) && !Array.isArray(c.expense) && c.income && c.expense) {
                         CATEGORIES = c;
                     }
                 }
