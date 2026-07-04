@@ -245,3 +245,59 @@ def save_budgets(bg: BudgetSave):
             bg_sheet.append_rows(new_rows)
 
     return {"success": True}
+
+
+# ====== Settings / Categories ======
+SETTINGS_SHEET = "系統設定"
+
+
+def ensure_settings_sheet():
+    sh = get_sheet()
+    try:
+        sheet = sh.worksheet(SETTINGS_SHEET)
+    except Exception:
+        sheet = sh.add_worksheet(SETTINGS_SHEET, 100, 2)
+        sheet.update("A1:B1", [["key", "value"]])
+        sheet.format("A1:B1", {"textFormat": {"bold": True}})
+    return sheet
+
+
+class SettingsData(BaseModel):
+    categories: Optional[dict] = None
+
+
+@app.get("/api/settings")
+def get_settings():
+    sheet = ensure_settings_sheet()
+    rows = sheet.get_all_values()
+    result = {}
+    for row in rows[1:]:
+        if row[0] and len(row) >= 2:
+            try:
+                result[row[0]] = json.loads(row[1])
+            except Exception:
+                result[row[0]] = row[1]
+    return {"success": True, "data": result}
+
+
+@app.post("/api/settings")
+def save_settings(settings: SettingsData):
+    sheet = ensure_settings_sheet()
+    data = sheet.get_all_values()
+
+    if settings.categories:
+        key = "categories"
+        value = json.dumps(settings.categories, ensure_ascii=False)
+
+        row_idx = None
+        for i, row in enumerate(data):
+            if i > 0 and row[0] == key:
+                row_idx = i + 1
+                break
+
+        if row_idx:
+            sheet.update(f"B{row_idx}", [[value]])
+        else:
+            sheet.append_row([key, value])
+
+    return {"success": True}
