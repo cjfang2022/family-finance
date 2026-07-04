@@ -1,0 +1,15 @@
+# 機密檔案 - Google Service Account
+google_creds.json
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+# IDE
+.vscode/
+.idea/
+# Railway
+.railway/
