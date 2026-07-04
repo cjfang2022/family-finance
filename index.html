@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭收支小管家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 min-h-screen">
+
+    <!-- 頂欄 -->
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">💳</span>
+                <div>
+                    <h1 class="font-bold text-lg tracking-wider">家庭收支小管家</h1>
+                    <p class="text-xs text-indigo-100">記帳 × 預算 × 報表</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 text-xs">
+                <span id="date-badge" class="bg-indigo-800/60 px-3 py-1.5 rounded-full font-semibold">載入中...</span>
+                <button onclick="exportCSV()" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition">📥 CSV</button>
+                <button onclick="resetAll()" class="bg-rose-500/70 hover:bg-rose-500 px-3 py-1.5 rounded-lg transition">🗑️ 重置</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- 快速摘要 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <p class="text-xs text-slate-400">本月收入</p>
+                <p id="sum-income" class="text-xl font-black text-emerald-600 mt-1">$0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <p class="text-xs text-slate-400">本月支出</p>
+                <p id="sum-expense" class="text-xl font-black text-rose-500 mt-1">$0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <p class="text-xs text-slate-400">本月結餘</p>
+                <p id="sum-balance" class="text-xl font-black text-indigo-600 mt-1">$0</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <p class="text-xs text-slate-400">筆數</p>
+                <p id="sum-count" class="text-xl font-black text-slate-600 mt-1">0</p>
+            </div>
+        </div>
+
+        <!-- 主要操作區：兩欄 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- 左：新增紀錄 -->
+            <div class="lg:col-span-1 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                <h2 class="font-bold text-sm text-slate-600 mb-4 flex items-center space-x-2">
+                    <span class="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-xs font-black">+</span>
+                    <span>新增記帳</span>
+                </h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-slate-400 font-medium">類別</label>
+                        <div class="flex space-x-2 mt-1">
+                            <button id="type-income" onclick="setType('income')" class="flex-1 py-2 rounded-xl text-xs font-bold transition bg-emerald-100 text-emerald-700 border border-emerald-200">💵 收入</button>
+                            <button id="type-expense" onclick="setType('expense')" class="flex-1 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-500 border border-slate-200">💸 支出</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-medium">日期</label>
+                        <input type="date" id="tx-date" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-medium">分類</label>
+                        <select id="tx-category" class="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-300 outline-none bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-medium">金額</label>
+                        <input type="number" id="tx-amount" placeholder="0" class="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-lg font-bold text-right focus:ring-2 focus:ring-indigo-300 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 font-medium">備註</label>
+                        <input type="text" id="tx-note" placeholder="例如：薪資、餐費..." class="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-300 outline-none">
+                    </div>
+                    <button onclick="addTransaction()" class="w-full py-3 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 transition shadow-md">
+                        ✅ 確認新增
+                    </button>
+                </div>
+            </div>
+
+            <!-- 右：近期明細 + 預算 -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- 預算進度 -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                    <h2 class="font-bold text-sm text-slate-600 mb-3 flex items-center space-x-2">
+                        <span class="w-6 h-6 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center text-xs">🎯</span>
+                        <span>本月預算</span>
+                        <button onclick="editBudget()" class="ml-auto text-xs text-indigo-500 hover:text-indigo-700 font-medium">✏️ 設定</button>
+                    </h2>
+                    <div id="budget-container" class="space-y-2">
+                        <div class="text-xs text-slate-400 text-center py-4">尚未設定預算，點「設定」開始</div>
+                    </div>
+                </div>
+
+                <!-- 近期明細 -->
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="font-bold text-sm text-slate-600 flex items-center space-x-2">
+                            <span class="w-6 h-6 bg-sky-100 text-sky-600 rounded-lg flex items-center justify-center text-xs">📋</span>
+                            <span>近期明細</span>
+                        </h2>
+                        <div class="flex space-x-2">
+                            <select id="month-filter" class="text-xs px-2 py-1.5 rounded-lg border border-slate-200 bg-white outline-none" onchange="renderTable()"></select>
+                            <button onclick="renderTable()" class="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg font-medium transition">🔄</button>
+                        </div>
+                    </div>
+                    <div id="tx-table" class="text-xs text-slate-400 text-center py-8">尚無紀錄</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定預算 Modal -->
+    <div id="budget-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-xl">
+            <h3 class="font-bold text-slate-700 mb-4">🎯 設定本月預算</h3>
+            <div id="budget-form" class="space-y-3"></div>
+            <div class="flex space-x-3 mt-6">
+                <button onclick="closeBudgetModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">取消</button>
+                <button onclick="saveBudget()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-md">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯/刪除單筆 Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl">
+            <h3 class="font-bold text-slate-700 mb-4">✏️ 編輯紀錄</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-slate-400">日期</label>
+                    <input type="date" id="edit-date" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">分類</label>
+                    <select id="edit-category" class="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none bg-white"></select>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">金額</label>
+                    <input type="number" id="edit-amount" class="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-lg font-bold text-right outline-none">
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400">備註</label>
+                    <input type="text" id="edit-note" class="w-full mt-1 px-3 py-2.5 rounded-xl border border-slate-200 text-sm outline-none">
+                </div>
+            </div>
+            <div class="flex space-x-3 mt-6">
+                <button onclick="deleteTransaction()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-100 text-rose-600 hover:bg-rose-200 transition">🗑️ 刪除</button>
+                <button onclick="closeEditModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">取消</button>
+                <button onclick="saveEdit()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-md">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== 資料結構 ======
+        const CATEGORIES = {
+            income: ['薪資', '獎金', '投資收益', '兼職收入', '紅包/禮金', '其他收入'],
+            expense: ['餐飲/外食', '日常採買', '交通', '居住/水電', '娛樂', '醫療', '教育', '通訊', '保險', '其他支出']
+        };
+
+        // 預算分類（預設，支出用）
+        const BUDGET_CATS = ['餐飲/外食', '日常採買', '交通', '居住/水電', '娛樂', '醫療', '教育', '通訊', '保險', '其他支出'];
+
+        let transactions = [];
+        let budgets = {};
+        let currentType = 'expense';
+        let editingId = null;
+
+        // ====== 初始化 ======
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('tx-date').value = today();
+            document.getElementById('month-filter').value = currentMonth();
+            updateDateBadge();
+            loadData();
+            renderCategories();
+            renderBudgetForm();
+            renderTable();
+            renderSummary();
+            renderBudgetProgress();
+        });
+
+        function today() { return new Date().toISOString().split('T')[0]; }
+        function currentMonth() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+
+        function updateDateBadge() {
+            const now = new Date();
+            const s = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            document.getElementById('date-badge').textContent = `🕐 ${s}`;
+        }
+
+        // ====== localStorage ======
+        function loadData() {
+            try {
+                const t = localStorage.getItem('famt_tx');
+                transactions = t ? JSON.parse(t) : [];
+                const b = localStorage.getItem('famt_budget');
+                budgets = b ? JSON.parse(b) : {};
+            } catch(e) { transactions = []; budgets = {}; }
+        }
+
+        function saveData() {
+            localStorage.setItem('famt_tx', JSON.stringify(transactions));
+            localStorage.setItem('famt_budget', JSON.stringify(budgets));
+        }
+
+        // ====== 類別切換 ======
+        function setType(t) {
+            currentType = t;
+            document.getElementById('type-income').className = t === 'income'
+                ? 'flex-1 py-2 rounded-xl text-xs font-bold transition bg-emerald-100 text-emerald-700 border border-emerald-200'
+                : 'flex-1 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-500 border border-slate-200';
+            document.getElementById('type-expense').className = t === 'expense'
+                ? 'flex-1 py-2 rounded-xl text-xs font-bold transition bg-emerald-100 text-emerald-700 border border-emerald-200'
+                : 'flex-1 py-2 rounded-xl text-xs font-bold transition bg-slate-100 text-slate-500 border border-slate-200';
+            renderCategories();
+        }
+
+        function renderCategories() {
+            const sel = document.getElementById('tx-category');
+            sel.innerHTML = CATEGORIES[currentType].map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        // ====== 新增交易 ======
+        function addTransaction() {
+            const date = document.getElementById('tx-date').value;
+            const category = document.getElementById('tx-category').value;
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const note = document.getElementById('tx-note').value.trim();
+            if (!date || !amount || amount <= 0) { alert('請填寫日期和有效的金額'); return; }
+            transactions.unshift({
+                id: Date.now() + '_' + Math.random().toString(36).slice(2,6),
+                date, type: currentType, category, amount: currentType === 'expense' ? -amount : amount,
+                note: note || (currentType === 'income' ? '收入' : '支出')
+            });
+            saveData();
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-note').value = '';
+            renderAll();
+        }
+
+        // ====== 明細表格 ======
+        function renderTable() {
+            const container = document.getElementById('tx-table');
+            const mf = document.getElementById('month-filter').value;
+            const filtered = transactions.filter(t => t.date.startsWith(mf));
+            if (!filtered.length) { container.innerHTML = '<div class="text-xs text-slate-400 py-8">尚無紀錄</div>'; return; }
+            let html = '<div class="space-y-1 max-h-80 overflow-y-auto no-scrollbar">';
+            filtered.slice(0, 50).forEach(t => {
+                const sign = t.amount >= 0 ? 'text-emerald-600' : 'text-rose-500';
+                const icon = t.amount >= 0 ? '📈' : '📉';
+                html += `<div onclick="openEdit('${t.id}')" class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition border-b border-slate-50 last:border-0">
+                    <div class="flex items-center space-x-3 min-w-0">
+                        <span>${icon}</span>
+                        <div class="min-w-0">
+                            <p class="text-xs font-medium text-slate-700 truncate">${escHtml(t.category)}${t.note ? ' · ' + escHtml(t.note) : ''}</p>
+                            <p class="text-[10px] text-slate-400">${t.date}</p>
+                        </div>
+                    </div>
+                    <span class="text-sm font-bold ${sign} shrink-0 ml-2">${t.amount > 0 ? '+' : ''}$${Math.abs(t.amount).toLocaleString()}</span>
+                </div>`;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // ====== 摘要 ======
+        function renderSummary() {
+            const mf = document.getElementById('month-filter').value;
+            const filtered = transactions.filter(t => t.date.startsWith(mf));
+            const income = filtered.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+            const expense = filtered.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
+            document.getElementById('sum-income').textContent = `$${income.toLocaleString()}`;
+            document.getElementById('sum-expense').textContent = `$${expense.toLocaleString()}`;
+            document.getElementById('sum-balance').textContent = `$${(income - expense).toLocaleString()}`;
+            document.getElementById('sum-count').textContent = filtered.length;
+        }
+
+        // ====== 預算系統 ======
+        function renderBudgetForm() {
+            const container = document.getElementById('budget-form');
+            container.innerHTML = BUDGET_CATS.map(c => `
+                <div class="flex items-center space-x-3">
+                    <label class="text-xs text-slate-500 w-20 shrink-0">${c}</label>
+                    <input type="number" id="bg-${c}" value="${budgets[c] || ''}" placeholder="0" class="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-sm text-right outline-none focus:ring-2 focus:ring-indigo-300">
+                </div>
+            `).join('');
+        }
+
+        function saveBudget() {
+            BUDGET_CATS.forEach(c => {
+                const v = parseFloat(document.getElementById(`bg-${c}`).value);
+                if (v > 0) budgets[c] = v;
+                else delete budgets[c];
+            });
+            saveData();
+            closeBudgetModal();
+            renderBudgetProgress();
+        }
+
+        function renderBudgetProgress() {
+            const container = document.getElementById('budget-container');
+            const mf = currentMonth();
+            const expense = transactions.filter(t => t.date.startsWith(mf) && t.amount < 0);
+            const spent = {};
+            expense.forEach(t => {
+                const cat = t.category;
+                if (!spent[cat]) spent[cat] = 0;
+                spent[cat] += Math.abs(t.amount);
+            });
+            const entries = Object.entries(budgets).filter(([c, b]) => b > 0);
+            if (!entries.length) { container.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">尚未設定預算，點「設定」開始</div>'; return; }
+            container.innerHTML = entries.map(([cat, budget]) => {
+                const used = spent[cat] || 0;
+                const pct = Math.min(100, Math.round((used / budget) * 100));
+                const color = pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-emerald-500';
+                return `<div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-slate-600 font-medium">${cat}</span>
+                        <span class="text-slate-400">$${used.toLocaleString()} / $${budget.toLocaleString()} (${pct}%)</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full ${color} rounded-full transition-all duration-500" style="width:${pct}%"></div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function editBudget() {
+            renderBudgetForm();
+            document.getElementById('budget-modal').classList.remove('hidden');
+        }
+
+        function closeBudgetModal() {
+            document.getElementById('budget-modal').classList.add('hidden');
+        }
+
+        // ====== 編輯 / 刪除 ======
+        function openEdit(id) {
+            const t = transactions.find(x => x.id === id);
+            if (!t) return;
+            editingId = id;
+            document.getElementById('edit-date').value = t.date;
+            document.getElementById('edit-category').innerHTML = CATEGORIES[t.amount >= 0 ? 'income' : 'expense'].map(c =>
+                `<option value="${c}" ${c === t.category ? 'selected' : ''}>${c}</option>`
+            ).join('');
+            document.getElementById('edit-amount').value = Math.abs(t.amount);
+            document.getElementById('edit-note').value = t.note || '';
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function saveEdit() {
+            const t = transactions.find(x => x.id === editingId);
+            if (!t) return;
+            t.date = document.getElementById('edit-date').value;
+            t.category = document.getElementById('edit-category').value;
+            const sign = t.amount >= 0 ? 1 : -1;
+            t.amount = parseFloat(document.getElementById('edit-amount').value) * sign;
+            t.note = document.getElementById('edit-note').value.trim();
+            saveData();
+            closeEditModal();
+            renderAll();
+        }
+
+        function deleteTransaction() {
+            if (!confirm('確定刪除此筆紀錄？')) return;
+            transactions = transactions.filter(t => t.id !== editingId);
+            saveData();
+            closeEditModal();
+            renderAll();
+        }
+
+        function closeEditModal() { editingId = null; document.getElementById('edit-modal').classList.add('hidden'); }
+
+        // ====== 重置 ======
+        function resetAll() {
+            if (!confirm('確定清空所有資料？')) return;
+            if (!confirm('再次確認！所有紀錄將永久消失！')) return;
+            transactions = []; budgets = {};
+            saveData();
+            renderAll();
+        }
+
+        // ====== CSV 匯出 ======
+        function exportCSV() {
+            const mf = document.getElementById('month-filter').value;
+            const filtered = transactions.filter(t => t.date.startsWith(mf));
+            if (!filtered.length) { alert('本月無資料可匯出'); return; }
+            const header = '日期,類別,分類,金額,備註\n';
+            const rows = filtered.map(t =>
+                `${t.date},${t.amount >= 0 ? '收入' : '支出'},${t.category},${t.amount},${t.note || ''}`
+            ).join('\n');
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + header + rows], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `收支紀錄_${mf}.csv`;
+            a.click();
+        }
+
+        // ====== 統整渲染 ======
+        function renderAll() {
+            renderSummary();
+            renderTable();
+            renderBudgetProgress();
+        }
+
+        function escHtml(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+    </script>
+</body>
+</html>
