@@ -102,8 +102,10 @@
                     </div>
                     <button onclick="parseAIInput()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">🤖 記帳</button>
                     <button onclick="document.getElementById('ai-cam-input').click()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-purple-600 hover:bg-purple-700 shadow-sm active:scale-[0.98] transition">📷</button>
+                    <button onclick="document.getElementById('ai-album-input').click()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-sky-600 hover:bg-sky-700 shadow-sm active:scale-[0.98] transition">🖼️</button>
                 </div>
                 <input type="file" id="ai-cam-input" accept="image/*" capture="environment" class="hidden" onchange="ocrImage(this)">
+                <input type="file" id="ai-album-input" accept="image/*" class="hidden" onchange="ocrImage(this)">
                 <div id="ai-ocr-loading" class="hidden mt-2 bg-purple-50 rounded-lg p-2.5 text-[10px] text-purple-600 text-center">🔍 OCR 辨識中...</div>
                 <!-- 多筆預覽 -->
                 <div id="ai-preview" class="hidden mt-2 space-y-1.5"></div>
@@ -787,9 +789,11 @@
             const total = _aiResults.length;
             let html = `<div class="bg-white rounded-lg p-2.5 border border-indigo-100 shadow-sm space-y-1.5">
                 <div class="flex justify-between items-center">
-                    <span class="text-[11px] font-bold text-slate-600">📋 共 ${total} 筆</span>
+                    <span class="text-[11px] font-bold text-slate-600">📋 共 ${total} 筆
+                        <span id="ai-selected-count" class="text-[10px] text-indigo-500 ml-1">（全選）</span></span>
                     <div class="flex space-x-1.5">
-                        <button onclick="confirmAllAI()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold active:bg-emerald-200 transition">✅ 全部確認送出</button>
+                        <button onclick="toggleAllCheck()" class="px-2 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-medium active:bg-slate-200 transition">🔁 全選/取消</button>
+                        <button onclick="confirmCheckedAI()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold active:bg-emerald-200 transition">✅ 送出選取</button>
                         <button onclick="clearAI()" class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-[10px] active:bg-slate-200 transition">✕</button>
                     </div>
                 </div>`;
@@ -797,10 +801,10 @@
             _aiResults.forEach((r, i) => {
                 const icon = r.type === 'income' ? '💵' : '💸';
                 const color = r.type === 'income' ? 'text-emerald-600' : 'text-rose-500';
-                const typeLabel = r.type === 'income' ? '收入' : '支出';
                 const bgColor = r.type === 'income' ? 'bg-emerald-50' : 'bg-rose-50';
-                html += `<div class="${bgColor} rounded-lg px-2.5 py-1.5 flex items-center justify-between">
-                    <div class="flex items-center space-x-1.5 min-w-0">
+                html += `<div class="${bgColor} rounded-lg px-2 py-1.5 flex items-center justify-between">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <input type="checkbox" id="ai-chk-${i}" checked onchange="updateSelectedCount()" class="w-4 h-4 rounded accent-indigo-600 shrink-0">
                         <span class="text-xs">${icon}</span>
                         <span class="text-[10px] font-medium text-slate-500">${r.category}</span>
                         <span class="text-[10px] text-slate-400 truncate">${r.note}</span>
@@ -813,6 +817,20 @@
             el.innerHTML = html;
         }
 
+        function updateSelectedCount() {
+            const total = _aiResults.length;
+            const checked = document.querySelectorAll('[id^="ai-chk-"]:checked').length;
+            const el = document.getElementById('ai-selected-count');
+            if (el) el.textContent = checked === total ? '（全選）' : `（選 ${checked}/${total}）`;
+        }
+
+        function toggleAllCheck() {
+            const boxes = document.querySelectorAll('[id^="ai-chk-"]');
+            const allChecked = Array.from(boxes).every(b => b.checked);
+            boxes.forEach(b => b.checked = !allChecked);
+            updateSelectedCount();
+        }
+
         function clearAI() {
             document.getElementById('ai-preview').classList.add('hidden');
             document.getElementById('ai-input').value = '';
@@ -820,8 +838,11 @@
             _confirmedCount = 0;
         }
 
-        async function confirmAllAI() {
-            const valid = _aiResults.filter(r => r.amount > 0);
+        async function confirmCheckedAI() {
+            const checked = Array.from(document.querySelectorAll('[id^="ai-chk-"]:checked'));
+            if (!checked.length) { showToast('⚠️ 請勾選要送出的項目'); return; }
+
+            const valid = checked.map(cb => _aiResults[parseInt(cb.id.replace('ai-chk-', ''))]).filter(r => r && r.amount > 0);
             if (!valid.length) { showToast('⚠️ 沒有有效項目'); return; }
 
             let ok = 0, fail = 0;
