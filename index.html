@@ -222,6 +222,7 @@
                         <label class="text-[10px] text-slate-400">Gemini API Key</label>
                         <div class="flex space-x-1.5 mt-1">
                             <input type="password" id="s-gemini-key" placeholder="輸入 Gemini API Key..." class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+                            <button onclick="testGeminiKey()" class="touch-btn px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg text-[10px] font-bold active:bg-amber-200 transition">🔌 測試</button>
                             <button onclick="saveGeminiKey()" class="touch-btn px-3 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold active:bg-indigo-200 transition">💾 儲存</button>
                             <button onclick="clearGeminiKey()" class="touch-btn px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold active:bg-rose-200 transition">✕</button>
                         </div>
@@ -876,6 +877,29 @@
             localStorage.removeItem('famt_gemini_key');
             loadGeminiKey();
             showToast('已關閉 AI 分類');
+        }
+        async function testGeminiKey() {
+            const key = document.getElementById('s-gemini-key').value.trim();
+            if (!key) { showToast('請先輸入 API Key'); return; }
+            showToast('🔌 測試中...');
+            try {
+                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: '回傳"ok"' }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 20 } })
+                });
+                const data = await r.json();
+                if (r.ok && data?.candidates) {
+                    showToast('✅ 連線成功！API Key 可用');
+                } else {
+                    const err = data?.error?.message || data?.error?.status || '不明錯誤';
+                    showToast('❌ API 錯誤：' + err);
+                    console.error('Gemini API error:', data);
+                }
+            } catch(e) {
+                showToast('❌ 網路錯誤：' + e.message);
+                console.error('Gemini test failed:', e);
+            }
         }
 
         function renderAIPreview() {
