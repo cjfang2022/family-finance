@@ -838,9 +838,10 @@
 
             // 嘗試多個模型：優先使用儲存的模型，否則依序嘗試
             const models = [
-                localStorage.getItem('famt_gemini_model') || 'gemini-2.0-flash',
-                'gemini-1.5-flash',
-                'gemini-2.0-flash'
+                localStorage.getItem('famt_gemini_model') || 'gemini-2.5-flash-lite',
+                'gemini-2.5-flash-lite',
+                'gemma-4-31b-it',
+                'gemini-2.5-flash'
             ];
             const tried = new Set();
             for (const model of models) {
@@ -905,18 +906,18 @@
             statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-100 text-amber-600';
             detailEl.classList.add('hidden');
             try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: '回傳"ok"' }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 20 } })
                 });
                 const data = await r.json();
                 if (r.ok && data?.candidates) {
-                    statusEl.textContent = '✅ 連線成功！（gemini-1.5-flash）';
+                    statusEl.textContent = '✅ 連線成功！（gemini-2.5-flash-lite）';
                     statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600';
                     detailEl.classList.add('hidden');
                     localStorage.setItem('famt_gemini_key', key);
-                    localStorage.setItem('famt_gemini_model', 'gemini-1.5-flash');
+                    localStorage.setItem('famt_gemini_model', 'gemini-2.5-flash-lite');
                 } else {
                     const err = data?.error?.message || data?.error?.status || JSON.stringify(data);
                     statusEl.textContent = '❌ API 錯誤';
