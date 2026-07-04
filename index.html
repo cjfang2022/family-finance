@@ -342,7 +342,13 @@
                 const r = await apiGet('/api/transactions');
                 transactions = r.data || [];
                 const s = await apiGet('/api/settings');
-                if (s.data && s.data.categories) CATEGORIES = s.data.categories;
+                if (s.data && s.data.categories) {
+                    const c = s.data.categories;
+                    // 保護：如果雲端分類少於 2 個，可能是資料異常，不要覆蓋
+                    if (c.income && c.income.length >= 2 && c.expense && c.expense.length >= 2) {
+                        CATEGORIES = c;
+                    }
+                }
                 setSync(true);
                 localStorage.setItem('famt_cats', JSON.stringify(CATEGORIES));
             } catch(e) {
