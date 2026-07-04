@@ -21,10 +21,8 @@
         .tab-btn.active { background: #eef2ff; color: #4338ca; border-color: #a5b4fc; }
         .animate-in { animation: fadeIn .25s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        /* 讓圖表在小螢幕不失真 */
         .chart-wrap { position: relative; width: 100%; height: 180px; }
         .chart-wrap canvas { max-height: 180px !important; max-width: 100% !important; }
-        /* 觸控友善間距 */
         .touch-btn { min-height: 44px; }
         @media print { .no-print { display: none !important; } body { background: #fff !important; } }
     </style>
@@ -38,7 +36,7 @@
                 <span class="text-xl shrink-0">💰</span>
                 <div class="min-w-0">
                     <h1 class="font-bold text-sm md:text-base tracking-wider truncate">家庭收支小管家</h1>
-                    <p class="text-[10px] text-indigo-200 truncate">記帳 × 預算 × 雲端</p>
+                    <p class="text-[10px] text-indigo-200 truncate">兩階記帳 × 預算 × 雲端</p>
                 </div>
             </div>
             <div class="flex items-center space-x-1 text-[10px] shrink-0">
@@ -50,7 +48,7 @@
         </div>
     </header>
 
-    <!-- 固定底部頁籤導航 (手機友善) -->
+    <!-- 固定底部頁籤導航 -->
     <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,0,0,.05)] no-print">
         <div class="max-w-lg mx-auto flex">
             <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active flex-1 flex flex-col items-center py-1.5 text-[10px] border-t-2 border-transparent active:border-indigo-500"><span class="text-base">📊</span><span>首頁</span></button>
@@ -61,19 +59,17 @@
         </div>
     </nav>
 
-    <!-- 主內容區塊 (預留底部導航空間) -->
+    <!-- 主內容區塊 -->
     <main class="max-w-lg mx-auto px-3 pt-3 pb-20 space-y-4">
 
         <!-- ==================== 儀表板 ==================== -->
         <div id="content-dashboard" class="tab-content active space-y-3 animate-in">
-            <!-- 四塊摘要 -->
             <div class="grid grid-cols-2 gap-2">
                 <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">本月收入</p><p id="d-income" class="text-base md:text-lg font-black text-emerald-600 mt-0.5">$0</p></div>
                 <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">本月支出</p><p id="d-expense" class="text-base md:text-lg font-black text-rose-500 mt-0.5">$0</p></div>
                 <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">本月結餘</p><p id="d-balance" class="text-base md:text-lg font-black text-indigo-600 mt-0.5">$0</p></div>
                 <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">筆數</p><p id="d-count" class="text-base md:text-lg font-black text-slate-600 mt-0.5">0</p></div>
             </div>
-            <!-- 圖表區：上下排列而非左右 -->
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
                 <h3 class="font-bold text-[11px] text-slate-500 mb-2">📈 近 6 月收支趨勢</h3>
                 <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
@@ -82,7 +78,6 @@
                 <h3 class="font-bold text-[11px] text-slate-500 mb-2">🥧 本月支出分類</h3>
                 <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
             </div>
-            <!-- 近期明細 -->
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
                 <h3 class="font-bold text-[11px] text-slate-500 mb-2">📋 近期明細</h3>
                 <div id="d-recent" class="text-xs text-slate-400 text-center py-4">載入中...</div>
@@ -94,7 +89,7 @@
             <!-- 🤖 AI 智慧記帳 -->
             <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 shadow-sm border border-indigo-100">
                 <h2 class="font-bold text-sm text-indigo-600 mb-1">🤖 AI 智慧記帳</h2>
-                <p class="text-[10px] text-slate-400 mb-2">輸入文字、按🎤說話、或📷拍照，自動拆成多筆！<br>例如「牛排120水果50搭高鐵1490薪水5萬」</p>
+                <p class="text-[10px] text-slate-400 mb-2">輸入文字、按🎤說話、或📷拍照，自動分類！<br>例如「牛排120 水果50 高鐵1490 薪水5萬」</p>
                 <div class="flex space-x-2">
                     <div class="flex-1 relative">
                         <input type="text" id="ai-input" placeholder="說或輸入文字，支援多筆..." onkeydown="if(event.key==='Enter')parseAIInput()" class="w-full px-3 py-2.5 rounded-lg border border-indigo-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300 pr-10">
@@ -107,7 +102,6 @@
                 <input type="file" id="ai-cam-input" accept="image/*" capture="environment" class="hidden" onchange="ocrImage(this)">
                 <input type="file" id="ai-album-input" accept="image/*" class="hidden" onchange="ocrImage(this)">
                 <div id="ai-ocr-loading" class="hidden mt-2 bg-purple-50 rounded-lg p-2.5 text-[10px] text-purple-600 text-center">🔍 OCR 辨識中...</div>
-                <!-- 多筆預覽 -->
                 <div id="ai-preview" class="hidden mt-2 space-y-1.5"></div>
             </div>
             <!-- 手動新增區 -->
@@ -121,12 +115,13 @@
                             <button id="t-type-expense" onclick="setTxType('expense')" class="touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">💸 支出</button>
                         </div>
                     </div>
+                    <div><label class="text-[10px] text-slate-400">日期</label><input type="date" id="tx-date" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300"></div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><label class="text-[10px] text-slate-400">日期</label><input type="date" id="tx-date" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300"></div>
-                        <div><label class="text-[10px] text-slate-400">分類</label><select id="tx-category" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+                        <div><label class="text-[10px] text-slate-400">大類</label><select id="tx-main-cat" onchange="renderTxSubCats()" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+                        <div><label class="text-[10px] text-slate-400">細項</label><select id="tx-sub-cat" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
                     </div>
                     <div><label class="text-[10px] text-slate-400">金額</label><input type="number" id="tx-amount" placeholder="0" inputmode="decimal" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-base font-bold text-right outline-none focus:ring-2 focus:ring-indigo-300"></div>
-                    <div><label class="text-[10px] text-slate-400">備註</label><input type="text" id="tx-note" placeholder="薪資、餐費..." class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300"></div>
+                    <div><label class="text-[10px] text-slate-400">備註</label><input type="text" id="tx-note" placeholder="選填" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300"></div>
                     <button onclick="addTransaction()" class="touch-btn w-full py-3 rounded-lg font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">✅ 確認新增</button>
                 </div>
             </div>
@@ -150,15 +145,16 @@
                     <h2 class="font-bold text-sm text-slate-600">🎯 預算</h2>
                     <input type="month" id="bg-month" class="text-[10px] px-2 py-1.5 rounded-lg border border-slate-200 outline-none" onchange="loadBudgets()">
                 </div>
-                <!-- 三塊小摘要 -->
                 <div class="grid grid-cols-3 gap-2 mb-3">
                     <div class="bg-indigo-50 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-400">預算總額</p><p id="bg-total" class="text-sm font-black text-indigo-600">$0</p></div>
                     <div class="bg-amber-50 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-400">已花費</p><p id="bg-spent" class="text-sm font-black text-amber-600">$0</p></div>
                     <div class="bg-emerald-50 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-400">剩餘</p><p id="bg-remain" class="text-sm font-black text-emerald-600">$0</p></div>
                 </div>
-                <!-- 各分類預算進度 -->
+                <!-- 各大類預算彙總 -->
+                <div id="bg-summary" class="space-y-2 mb-3"></div>
+                <!-- 細項預算 -->
                 <div id="bg-list" class="space-y-2"></div>
-                <button onclick="editAllBudgets()" class="touch-btn w-full mt-3 py-2.5 rounded-lg font-bold text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 transition">✏️ 編輯全部預算</button>
+                <button onclick="editAllBudgets()" class="touch-btn w-full mt-3 py-2.5 rounded-lg font-bold text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 transition">✏️ 編輯預算</button>
             </div>
         </div>
 
@@ -172,7 +168,7 @@
                 <div class="chart-wrap"><canvas id="reportChart"></canvas></div>
             </div>
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-[11px] text-slate-500 mb-2">📋 分類彙總</h3>
+                <h3 class="font-bold text-[11px] text-slate-500 mb-2">📋 分類彙總（大類）</h3>
                 <div id="r-summary" class="text-xs text-slate-400 text-center py-4">載入中...</div>
             </div>
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
@@ -190,22 +186,22 @@
         <!-- ==================== 設定 ==================== -->
         <div id="content-settings" class="tab-content space-y-3 animate-in">
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-sm text-slate-600 mb-3">⚙️ 自訂分類</h3>
+                <h3 class="font-bold text-sm text-slate-600 mb-3">⚙️ 自訂分類（兩階）</h3>
                 <div class="space-y-3">
                     <div>
-                        <h4 class="text-[11px] font-bold text-emerald-600 mb-1.5">收入分類</h4>
-                        <div id="s-income-cats" class="flex flex-wrap gap-1.5 mb-1.5"></div>
+                        <h4 class="text-[11px] font-bold text-emerald-600 mb-1.5">收入大類</h4>
+                        <div id="s-income-main" class="space-y-1.5 mb-2"></div>
                         <div class="flex space-x-1.5">
-                            <input id="s-new-income" placeholder="新增分類" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
-                            <button onclick="addIncomeCat()" class="touch-btn px-3 py-2 bg-emerald-100 text-emerald-600 rounded-lg text-xs font-bold active:bg-emerald-200 transition">＋</button>
+                            <input id="s-new-income-main" placeholder="新增大類名稱" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+                            <button onclick="addMainCat('income')" class="touch-btn px-3 py-2 bg-emerald-100 text-emerald-600 rounded-lg text-xs font-bold active:bg-emerald-200 transition">＋大類</button>
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-[11px] font-bold text-rose-600 mb-1.5">支出分類</h4>
-                        <div id="s-expense-cats" class="flex flex-wrap gap-1.5 mb-1.5"></div>
+                        <h4 class="text-[11px] font-bold text-rose-600 mb-1.5">支出大類</h4>
+                        <div id="s-expense-main" class="space-y-1.5 mb-2"></div>
                         <div class="flex space-x-1.5">
-                            <input id="s-new-expense" placeholder="新增分類" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
-                            <button onclick="addExpenseCat()" class="touch-btn px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold active:bg-rose-200 transition">＋</button>
+                            <input id="s-new-expense-main" placeholder="新增大類名稱" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+                            <button onclick="addMainCat('expense')" class="touch-btn px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold active:bg-rose-200 transition">＋大類</button>
                         </div>
                     </div>
                 </div>
@@ -230,8 +226,6 @@
                     </div>
                     <p class="text-[9px] text-slate-400 leading-relaxed">
                         🔑 免費申請：<a href="https://aistudio.google.com/apikey" target="_blank" class="text-indigo-500 underline">Google AI Studio</a>
-                        ｜每天 1,500 次免費額度<br>
-                        💡 啟用後會改用 AI 判斷分類，更聰明！
                     </p>
                 </div>
             </div>
@@ -247,11 +241,12 @@
         </div>
     </main>
 
-    <!-- Modal: 編輯預算 (手機全螢幕) -->
+    <!-- Modal: 編輯預算 -->
     <div id="modal-budget" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
         <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-4 pb-8 sm:pb-4 max-h-[85vh] overflow-y-auto animate-in">
             <div class="flex justify-center mb-3 sm:hidden"><div class="w-10 h-1 bg-slate-300 rounded-full"></div></div>
             <h3 class="font-bold text-sm text-slate-700 mb-3">✏️ 編輯本月預算</h3>
+            <div id="modal-budget-tabs" class="flex space-x-1 mb-3 overflow-x-auto no-scrollbar"></div>
             <div id="modal-budget-form" class="space-y-2"></div>
             <div class="flex space-x-2 mt-4">
                 <button onclick="closeModal('modal-budget')" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">取消</button>
@@ -267,7 +262,10 @@
             <h3 class="font-bold text-sm text-slate-700 mb-3">✏️ 編輯紀錄</h3>
             <div class="space-y-2.5">
                 <div><label class="text-[10px] text-slate-400">日期</label><input type="date" id="e-date" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none"></div>
-                <div><label class="text-[10px] text-slate-400">分類</label><select id="e-category" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="text-[10px] text-slate-400">大類</label><select id="e-main-cat" onchange="renderEditSubCats()" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+                    <div><label class="text-[10px] text-slate-400">細項</label><select id="e-sub-cat" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+                </div>
                 <div><label class="text-[10px] text-slate-400">金額</label><input type="number" id="e-amount" inputmode="decimal" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-base font-bold text-right outline-none"></div>
                 <div><label class="text-[10px] text-slate-400">備註</label><input type="text" id="e-note" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none"></div>
             </div>
@@ -279,28 +277,91 @@
         </div>
     </div>
 
+    <!-- Modal: 編輯大類細項 -->
+    <div id="modal-subcats" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
+        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-4 pb-8 sm:pb-4 animate-in">
+            <div class="flex justify-center mb-3 sm:hidden"><div class="w-10 h-1 bg-slate-300 rounded-full"></div></div>
+            <h3 class="font-bold text-sm text-slate-700 mb-3" id="modal-subcats-title">編輯細項</h3>
+            <div id="modal-subcats-list" class="space-y-1.5 mb-3 max-h-52 overflow-y-auto"></div>
+            <div class="flex space-x-1.5">
+                <input id="modal-subcats-input" placeholder="新增細項" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
+                <button onclick="addSubCatFromModal()" class="touch-btn px-3 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold active:bg-indigo-200 transition">＋</button>
+            </div>
+            <div class="flex space-x-2 mt-4">
+                <button onclick="closeModal('modal-subcats')" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">關閉</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium transition-all duration-400 opacity-0 scale-90 pointer-events-none bg-slate-800/90 text-white backdrop-blur-sm whitespace-nowrap"><span id="toast-msg"></span></div>
 
     <script>
         // ====== 設定 ======
-        // 自動偵測 tunnel 網址 (可被 localStorage 覆蓋)
         const API_BASE = (() => {
             const saved = localStorage.getItem('famt_api_base');
             if (saved) return saved;
-            // 從 script 所在頁面自動推斷（部署時 dynamic 用）
             return 'https://invision-first-mall-nose.trycloudflare.com';
         })();
 
-        let CATEGORIES = {
-            income: ['薪資','獎金','投資收益','兼職收入','紅包/禮金','其他收入'],
-            expense: ['餐飲/外食','日常採買','交通','居住/水電','娛樂','醫療','教育','通訊','保險','其他支出']
+        // ====== 兩階分類結構 ======
+        const DEFAULT_CATEGORIES = {
+            income: {
+                '工作收入': ['薪資', '加班費', '差旅費'],
+                '獎金': ['年終獎金', '考績獎金', '不休假獎金', '公司禮金'],
+                '補助': ['國旅卡補助', '公保補助', '國家補助'],
+                '投資收益': ['活存利息', '定存利息', '股票配息', '投資獲利'],
+                '租賃收入': ['租金收入'],
+                '其他收入': ['現金回饋', '保險理賠金', '中獎獎金', '拍賣收入', '退款', '退稅', '代墊收入', '贊助還款', '其他收入']
+            },
+            expense: {
+                '飲食': ['食材', '外食'],
+                '生活消費': ['日用品', '居家用品', '置裝', '書籍', '健身運動'],
+                '耐久財': ['3C產品', '家電', '家具'],
+                '休閒與社交': ['休閒娛樂', '交際應酬', '禮金', '捐款', '訂閱服務'],
+                '旅遊': ['國內旅遊', '國外旅遊'],
+                '教育': ['學雜費', '補習班', '進修教育'],
+                '醫療': ['健保醫療', '自費醫療'],
+                '交通運輸': ['大眾運輸', '智慧卡儲值', '汽機車油錢', '汽機車停車', '汽機車維護', '汽機車保險', '汽機車稅金'],
+                '居住': ['房屋租金', '房屋貸款', '房屋修繕', '居家用品維修', '大樓管理費', '房屋稅金'],
+                '水電通訊': ['水', '電', '瓦斯', '電信', '寬頻網路', '有線電視'],
+                '育兒': ['保母費', '嬰幼兒伙食', '嬰幼兒日用品'],
+                '家庭': ['零用錢', '孝親費', '父母照護費'],
+                '保險與退休': ['人壽保險', '公保', '健保', '退撫基金'],
+                '稅務': ['綜合所得稅'],
+                '投資': ['國外投資雜費', '投資手續費'],
+                '其他': ['公務代墊', '國旅卡代墊', '寵物', '雜費', '其他未分類支出']
+            }
         };
-        const BUDGET_CATS = ['餐飲/外食','日常採買','交通','居住/水電','娛樂','醫療','教育','通訊','保險','其他支出'];
+
+        let CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
         let transactions = [], budgets = {}, txType = 'expense', editingId = null;
         let _lastSyncVersion = null, _syncTimer = null, _isSyncing = false;
         let trendChart = null, catChart = null, reportChart = null;
+        let _budgetEditType = 'expense'; // 預算編輯目前查看的大類
 
+        // ====== 分類輔助函數 ======
+        function getMainCats(type) { return Object.keys(CATEGORIES[type] || {}); }
+        function getSubCats(type, main) { return CATEGORIES[type]?.[main] || []; }
+        function catPath(main, sub) { return main + '/' + sub; }
+        function splitCat(catStr) {
+            if (!catStr) return { main: '', sub: '' };
+            const i = catStr.indexOf('/');
+            if (i > 0) return { main: catStr.slice(0, i), sub: catStr.slice(i + 1) };
+            return { main: catStr, sub: '' };
+        }
+        function displayCat(catStr) {
+            const { main, sub } = splitCat(catStr);
+            return sub ? main + ' > ' + sub : main;
+        }
+        function findMainCat(type, subCat) {
+            for (const [main, subs] of Object.entries(CATEGORIES[type] || {})) {
+                if (subs.includes(subCat)) return main;
+            }
+            return getMainCats(type)[0] || '';
+        }
+
+        // ====== 初始化 ======
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('tx-date').value = today();
             document.getElementById('tx-month').value = currentMonth();
@@ -314,65 +375,40 @@
             startAutoSync();
         });
 
-        /** 自動同步：每 30 秒檢查雲端版號，有變動就自動重新載入 */
+        // ====== 版號同步 ======
         async function checkSync() {
             if (_isSyncing) return;
             _isSyncing = true;
             try {
                 const r = await apiGet('/api/sync-version');
                 if (!r.success) return;
-                if (_lastSyncVersion === null) {
-                    _lastSyncVersion = r.version;
-                    return;
-                }
+                if (_lastSyncVersion === null) { _lastSyncVersion = r.version; return; }
                 if (r.version !== _lastSyncVersion) {
                     _lastSyncVersion = r.version;
                     const currentTab = document.querySelector('.tab-content.active')?.id?.replace('content-', '') || 'dashboard';
                     await loadFromCloud();
-                    // 重新整理當前頁籤
                     switchTab(currentTab);
                     showSyncBadge('🔄');
                     setTimeout(() => showSyncBadge('☁️'), 3000);
                 }
-            } catch(_) {
-                // 離線時安靜忽略
-            } finally {
-                _isSyncing = false;
-            }
+            } catch(_) {} finally { _isSyncing = false; }
         }
-
-        function startAutoSync() {
-            if (_syncTimer) clearInterval(_syncTimer);
-            _syncTimer = setInterval(checkSync, 30000);
-        }
-
-        function showSyncBadge(icon) {
-            document.getElementById('sync-icon').textContent = icon;
-        }
-
-        function stopAutoSync() {
-            if (_syncTimer) { clearInterval(_syncTimer); _syncTimer = null; }
-        }
+        function startAutoSync() { if (_syncTimer) clearInterval(_syncTimer); _syncTimer = setInterval(checkSync, 30000); }
+        function showSyncBadge(icon) { document.getElementById('sync-icon').textContent = icon; }
+        function stopAutoSync() { if (_syncTimer) { clearInterval(_syncTimer); _syncTimer = null; } }
 
         function today() { const d = new Date(); return d.toISOString().split('T')[0]; }
-        function currentMonth() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
-        function monthLabel(m) { const [y,mo]=m.split('-'); return `${y.slice(-2)}/${mo}`; }
-
+        function currentMonth() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
+        function monthLabel(m) { const [y,mo]=m.split('-'); return y.slice(-2)+'/'+mo; }
         function updateDateBadge() {
             const n = new Date();
-            document.getElementById('date-badge') && (document.getElementById('date-badge').textContent = `${n.getFullYear()}/${String(n.getMonth()+1).padStart(2,'0')}/${String(n.getDate()).padStart(2,'0')}`);
+            document.getElementById('date-badge') && (document.getElementById('date-badge').textContent = n.getFullYear()+'/'+String(n.getMonth()+1).padStart(2,'0')+'/'+String(n.getDate()).padStart(2,'0'));
         }
-
         function fillMonthSelects() {
             const opts = [];
-            for (let i = 0; i < 12; i++) {
-                const d = new Date(); d.setMonth(d.getMonth() - i);
-                const m = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                opts.push(`<option value="${m}">${monthLabel(m)}</option>`);
-            }
-            const html = opts.join('');
-            document.getElementById('tx-month').innerHTML = html;
-            document.getElementById('r-month').innerHTML = html;
+            for (let i = 0; i < 12; i++) { const d = new Date(); d.setMonth(d.getMonth()-i); const m = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); opts.push('<option value="'+m+'">'+monthLabel(m)+'</option>'); }
+            document.getElementById('tx-month').innerHTML = opts.join('');
+            document.getElementById('r-month').innerHTML = opts.join('');
         }
 
         // ====== API ======
@@ -388,8 +424,7 @@
                 const s = await apiGet('/api/settings');
                 if (s.data && s.data.categories) {
                     const c = s.data.categories;
-                    // 保護：如果雲端分類少於 2 個，可能是資料異常，不要覆蓋
-                    if (c.income && c.income.length >= 2 && c.expense && c.expense.length >= 2) {
+                    if (c && typeof c === 'object' && c.income && c.expense) {
                         CATEGORIES = c;
                     }
                 }
@@ -401,17 +436,13 @@
                 showToast('⚠️ 離線模式');
             }
             await loadBudgets();
-            // 同步載入後更新版號記錄
             try { const v = await apiGet('/api/sync-version'); if (v.success) _lastSyncVersion = v.version; } catch(_) {}
             renderAll();
         }
-
         function setSync(ok) {
             document.getElementById('sync-icon').textContent = ok ? '☁️' : '⚠️';
             document.getElementById('sync-label').textContent = ok ? '已連線' : '離線';
         }
-
-        /** 手動同步按鈕：強制重新載入雲端資料 */
         async function manualSync() {
             const btn = document.querySelector('#sync-icon').parentElement;
             btn.classList.add('pointer-events-none', 'opacity-60');
@@ -421,27 +452,24 @@
                 const currentTab = document.querySelector('.tab-content.active')?.id?.replace('content-', '') || 'dashboard';
                 switchTab(currentTab);
                 showToast('✅ 已同步');
-            } catch(e) {
-                showToast('⚠️ 同步失敗');
-            } finally {
-                btn.classList.remove('pointer-events-none', 'opacity-60');
-            }
+            } catch(e) { showToast('⚠️ 同步失敗'); }
+            finally { btn.classList.remove('pointer-events-none', 'opacity-60'); }
         }
 
         // ====== 頁籤 ======
         function switchTab(t) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('content-' + t).classList.add('active');
-            document.getElementById('tab-' + t).classList.add('active');
+            document.getElementById('content-'+t).classList.add('active');
+            document.getElementById('tab-'+t).classList.add('active');
             if (t === 'dashboard') renderDashboard();
             if (t === 'reports') renderReport();
-            if (t === 'transactions') renderTxTable();
+            if (t === 'transactions') { renderTxCats(); renderTxTable(); }
             if (t === 'settings') { renderSettingsCats(); loadGeminiKey(); }
             window.scrollTo(0, 0);
         }
 
-        // ====== 交易類型 ======
+        // ====== 交易類型與分類選單 ======
         function setTxType(t) {
             txType = t;
             document.getElementById('t-type-income').className = t === 'income'
@@ -452,17 +480,29 @@
                 : 'touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200';
             renderTxCats();
         }
-        function renderTxCats() { document.getElementById('tx-category').innerHTML = CATEGORIES[txType].map(c => `<option>${c}</option>`).join(''); }
+        function renderTxCats() {
+            const mains = getMainCats(txType);
+            const sel = document.getElementById('tx-main-cat');
+            sel.innerHTML = mains.map(m => '<option value="'+escAttr(m)+'">'+esc(m)+'</option>').join('');
+            renderTxSubCats();
+        }
+        function renderTxSubCats() {
+            const main = document.getElementById('tx-main-cat').value;
+            const subs = getSubCats(txType, main);
+            document.getElementById('tx-sub-cat').innerHTML = subs.map(s => '<option value="'+escAttr(s)+'">'+esc(s)+'</option>').join('');
+        }
 
         // ====== 新增交易 ======
         async function addTransaction() {
             const date = document.getElementById('tx-date').value;
-            const category = document.getElementById('tx-category').value;
+            const main = document.getElementById('tx-main-cat').value;
+            const sub = document.getElementById('tx-sub-cat').value;
             const amount = parseFloat(document.getElementById('tx-amount').value);
             const note = document.getElementById('tx-note').value.trim();
-            if (!date || !amount || amount <= 0) { showToast('請填寫日期和金額'); return; }
+            if (!date || isNaN(amount) || amount === 0) { showToast('請填寫日期和金額'); return; }
+            const category = catPath(main, sub);
             try {
-                await apiPost('/api/transactions', { date, type: txType, category, amount, note: note || (txType === 'income' ? '收入' : '支出') });
+                await apiPost('/api/transactions', { date, type: txType, category, amount, note });
                 document.getElementById('tx-amount').value = '';
                 document.getElementById('tx-note').value = '';
                 showToast('✅ 已存入雲端');
@@ -480,16 +520,13 @@
             let html = '<div class="space-y-0.5 max-h-80 overflow-y-auto no-scrollbar">';
             f.sort((a,b) => (b.date + b.id).localeCompare(a.date + a.id)).forEach(t => {
                 const s = t.amount >= 0 ? 'text-emerald-600' : 'text-rose-500';
-                html += `<div onclick="openEditTx('${t.id}')" class="flex items-center justify-between px-2 py-2 active:bg-slate-50 rounded-lg border-b border-slate-50 last:border-0 cursor-pointer">
-                    <div class="flex items-center space-x-2 min-w-0">
-                        <span>${t.amount >= 0 ? '📈' : '📉'}</span>
-                        <div class="min-w-0">
-                            <p class="text-xs font-medium text-slate-700 truncate">${esc(t.category)}${t.note ? ' · '+esc(t.note) : ''}</p>
-                            <p class="text-[9px] text-slate-400">${t.date}</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold ${s} shrink-0">${t.amount > 0 ? '+' : ''}$${Math.abs(t.amount).toLocaleString()}</span>
-                </div>`;
+                html += '<div onclick="openEditTx(\''+escAttr(t.id)+'\')" class="flex items-center justify-between px-2 py-2 active:bg-slate-50 rounded-lg border-b border-slate-50 last:border-0 cursor-pointer">'
+                    + '<div class="flex items-center space-x-2 min-w-0">'
+                    + '<span>'+(t.amount >= 0 ? '📈' : '📉')+'</span>'
+                    + '<div class="min-w-0">'
+                    + '<p class="text-xs font-medium text-slate-700 truncate">'+displayCat(t.category)+(t.note ? ' · '+esc(t.note) : '')+'</p>'
+                    + '<p class="text-[9px] text-slate-400">'+t.date+'</p></div></div>'
+                    + '<span class="text-xs font-bold '+s+' shrink-0">'+(t.amount > 0 ? '+' : '')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
             });
             html += '</div>';
             el.innerHTML = html;
@@ -500,15 +537,30 @@
             const t = transactions.find(x => x.id === id); if (!t) return;
             editingId = id;
             document.getElementById('e-date').value = t.date;
-            document.getElementById('e-category').innerHTML = CATEGORIES[t.amount >= 0 ? 'income' : 'expense'].map(c => `<option ${c===t.category?'selected':''}>${c}</option>`).join('');
-            document.getElementById('e-amount').value = Math.abs(t.amount);
+            document.getElementById('e-amount').value = t.amount;
             document.getElementById('e-note').value = t.note || '';
+            const { main, sub } = splitCat(t.category);
+            const type = t.amount >= 0 ? 'income' : 'expense';
+            // fill main cat select
+            const mains = getMainCats(type);
+            const mainSel = document.getElementById('e-main-cat');
+            mainSel.innerHTML = mains.map(m => '<option value="'+escAttr(m)+'"'+(m===main?' selected':'')+'>'+esc(m)+'</option>').join('');
+            renderEditSubCats(sub);
             openModal('modal-edit');
+        }
+        function renderEditSubCats(selectedSub) {
+            const main = document.getElementById('e-main-cat').value;
+            const t = transactions.find(x => x.id === editingId);
+            const type = t ? (t.amount >= 0 ? 'income' : 'expense') : 'expense';
+            const subs = getSubCats(type, main);
+            document.getElementById('e-sub-cat').innerHTML = subs.map(s => '<option value="'+escAttr(s)+'"'+(s===selectedSub?' selected':'')+'>'+esc(s)+'</option>').join('');
         }
         async function saveEditTx() {
             const t = transactions.find(x => x.id === editingId); if (!t) return;
+            const main = document.getElementById('e-main-cat').value;
+            const sub = document.getElementById('e-sub-cat').value;
             try {
-                await apiPut('/api/transactions', { id: editingId, date: document.getElementById('e-date').value, category: document.getElementById('e-category').value, amount: parseFloat(document.getElementById('e-amount').value), note: document.getElementById('e-note').value.trim() });
+                await apiPut('/api/transactions', { id: editingId, date: document.getElementById('e-date').value, category: catPath(main, sub), amount: parseFloat(document.getElementById('e-amount').value), note: document.getElementById('e-note').value.trim() });
                 closeModal('modal-edit'); showToast('✅ 已更新'); await loadFromCloud();
             } catch(e) { showToast('⚠️ 失敗'); }
         }
@@ -525,7 +577,6 @@
             catch(e) { budgets = JSON.parse(localStorage.getItem('famt_budget') || '{}'); }
             renderBudgets();
         }
-
         function renderBudgets() {
             const m = document.getElementById('bg-month').value || currentMonth();
             const exp = transactions.filter(t => t.date && t.date.startsWith(m) && t.amount < 0);
@@ -537,31 +588,92 @@
             document.getElementById('bg-spent').textContent = '$' + totalSpent.toLocaleString();
             document.getElementById('bg-remain').textContent = '$' + (totalBud - totalSpent).toLocaleString();
 
-            const entries = BUDGET_CATS.map(c => ({ cat: c, budget: budgets[c] || 0, used: spent[c] || 0 }));
+            // 大類彙總
+            const mainSummary = {};
+            for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
+                let budgetSum = 0, spentSum = 0;
+                subs.forEach(sub => {
+                    const key = catPath(main, sub);
+                    budgetSum += budgets[key] || 0;
+                    spentSum += spent[key] || 0;
+                });
+                if (budgetSum > 0 || spentSum > 0) {
+                    mainSummary[main] = { budget: budgetSum, spent: spentSum };
+                }
+            }
+            const sumEl = document.getElementById('bg-summary');
+            const sumKeys = Object.keys(mainSummary);
+            if (sumKeys.length) {
+                sumEl.innerHTML = '<div class="text-[10px] font-bold text-slate-500 mb-1">📊 大類彙總</div>'
+                    + sumKeys.map(main => {
+                        const { budget, spent } = mainSummary[main];
+                        const pct = Math.min(100, Math.round((spent/budget)*100));
+                        return '<div class="bg-slate-50 rounded-lg p-2">'
+                            + '<div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium">'+esc(main)+'</span><span class="text-slate-400">$'+spent.toLocaleString()+' / $'+budget.toLocaleString()+'</span></div>'
+                            + '<div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div class="h-full '+(pct>=100?'bg-rose-500':pct>=80?'bg-amber-500':'bg-emerald-500')+' rounded-full" style="width:'+pct+'%"></div></div></div>';
+                    }).join('');
+            } else {
+                sumEl.innerHTML = '';
+            }
+
+            // 細項預算
+            const entries = [];
+            for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
+                subs.forEach(sub => {
+                    const key = catPath(main, sub);
+                    const b = budgets[key] || 0;
+                    const u = spent[key] || 0;
+                    if (b > 0) entries.push({ main, sub, key, budget: b, used: u });
+                });
+            }
             const el = document.getElementById('bg-list');
-            const active = entries.filter(e => e.budget > 0);
-            if (!active.length) { el.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">尚未設定預算</div>'; return; }
-            el.innerHTML = active.map(({cat, budget, used}) => {
-                const pct = Math.min(100, Math.round((used / budget) * 100));
+            if (!entries.length) { el.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">尚未設定預算</div>'; return; }
+            el.innerHTML = entries.map(({main, sub, key, budget, used}) => {
+                const pct = Math.min(100, Math.round((used/budget)*100));
                 const remain = budget - used;
                 const barColor = pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-emerald-500';
-                return `<div class="bg-slate-50 rounded-lg p-2.5">
-                    <div class="flex justify-between text-[11px] mb-1"><span class="font-medium text-slate-700">${cat}</span><span class="text-slate-400">$${used.toLocaleString()} / $${budget.toLocaleString()}</span></div>
-                    <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-1"><div class="h-full ${barColor} rounded-full transition-all" style="width:${pct}%"></div></div>
-                    <div class="flex justify-between text-[10px]"><span class="${pct >= 100 ? 'text-rose-500' : 'text-slate-400'}">${pct}%</span><span class="font-medium ${remain >= 0 ? 'text-emerald-600' : 'text-rose-500'}">剩 $${remain.toLocaleString()}</span></div>
-                </div>`;
+                return '<div class="bg-slate-50 rounded-lg p-2.5">'
+                    + '<div class="flex justify-between text-[11px] mb-1"><span class="font-medium text-slate-700">'+esc(main)+' > '+esc(sub)+'</span><span class="text-slate-400">$'+used.toLocaleString()+' / $'+budget.toLocaleString()+'</span></div>'
+                    + '<div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-1"><div class="h-full '+barColor+' rounded-full transition-all" style="width:'+pct+'%"></div></div>'
+                    + '<div class="flex justify-between text-[10px]"><span class="'+(pct>=100?'text-rose-500':'text-slate-400')+'">'+pct+'%</span><span class="font-medium '+(remain>=0?'text-emerald-600':'text-rose-500')+'">剩 $'+remain.toLocaleString()+'</span></div></div>';
             }).join('');
         }
 
         function editAllBudgets() {
             const m = document.getElementById('bg-month').value || currentMonth();
-            document.getElementById('modal-budget-form').innerHTML =
-                BUDGET_CATS.map(c => `<div class="flex items-center space-x-2"><label class="text-[11px] text-slate-500 w-16 shrink-0">${c}</label><input type="number" id="mb-${c}" value="${budgets[c] || ''}" placeholder="0" inputmode="numeric" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs text-right outline-none"></div>`).join('');
+            _budgetEditType = 'expense';
+            renderBudgetTabs();
+            renderBudgetForm('飲食');
             openModal('modal-budget');
+        }
+        function renderBudgetTabs() {
+            const mains = getMainCats('expense');
+            const el = document.getElementById('modal-budget-tabs');
+            el.innerHTML = mains.map(m => '<button onclick="renderBudgetForm(\''+escAttr(m)+'\')" class="touch-btn px-2.5 py-1.5 rounded-lg text-[10px] font-medium border '+(m==='飲食'?'bg-indigo-100 text-indigo-600 border-indigo-200':'bg-slate-50 text-slate-500 border-slate-200')+' whitespace-nowrap">'+esc(m)+'</button>').join('');
+        }
+        function renderBudgetForm(main) {
+            _budgetEditType = 'expense';
+            // highlight tab
+            document.querySelectorAll('#modal-budget-tabs button').forEach(b => {
+                b.className = 'touch-btn px-2.5 py-1.5 rounded-lg text-[10px] font-medium border '+(b.textContent===main?'bg-indigo-100 text-indigo-600 border-indigo-200':'bg-slate-50 text-slate-500 border-slate-200')+' whitespace-nowrap';
+            });
+            const subs = getSubCats('expense', main);
+            const el = document.getElementById('modal-budget-form');
+            el.innerHTML = '<div class="text-[11px] font-bold text-slate-500 mb-1">'+esc(main)+'</div>'
+                + subs.map(sub => {
+                    const key = catPath(main, sub);
+                    return '<div class="flex items-center space-x-2"><span class="text-[11px] text-slate-500 w-20 shrink-0 truncate">'+esc(sub)+'</span><input type="number" id="mb-'+escAttr(key)+'" value="'+(budgets[key]||'')+'" placeholder="0" inputmode="numeric" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs text-right outline-none"></div>';
+                }).join('');
         }
         async function saveAllBudgets() {
             const nb = {};
-            BUDGET_CATS.forEach(c => { const v = parseFloat(document.getElementById('mb-'+c).value); if (v > 0) nb[c] = v; });
+            for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
+                subs.forEach(sub => {
+                    const key = catPath(main, sub);
+                    const v = parseFloat(document.getElementById('mb-'+key)?.value);
+                    if (v > 0) nb[key] = v;
+                });
+            }
             const m = document.getElementById('bg-month').value || currentMonth();
             try { await apiPost('/api/budgets', { budgets: nb, month: m }); budgets = nb; closeModal('modal-budget'); showToast('✅ 預算已儲存'); renderBudgets(); }
             catch(e) { showToast('⚠️ 失敗'); }
@@ -584,7 +696,7 @@
                 let html = '<div class="space-y-0.5 max-h-48 overflow-y-auto no-scrollbar">';
                 f.sort((a,b) => (b.date + b.id).localeCompare(a.date + a.id)).slice(0, 8).forEach(t => {
                     const s = t.amount >= 0 ? 'text-emerald-600' : 'text-rose-500';
-                    html += `<div class="flex justify-between items-center px-2 py-1.5 border-b border-slate-50"><div class="flex items-center space-x-1.5 min-w-0"><span>${t.amount >= 0 ? '📈' : '📉'}</span><span class="text-xs truncate">${esc(t.category)}</span><span class="text-[9px] text-slate-400 shrink-0">${t.date.slice(5)}</span></div><span class="text-xs font-bold ${s} shrink-0">${t.amount > 0 ? '+' : ''}$${Math.abs(t.amount).toLocaleString()}</span></div>`;
+                    html += '<div class="flex justify-between items-center px-2 py-1.5 border-b border-slate-50"><div class="flex items-center space-x-1.5 min-w-0"><span>'+(t.amount>=0?'📈':'📉')+'</span><span class="text-xs truncate">'+displayCat(t.category)+'</span><span class="text-[9px] text-slate-400 shrink-0">'+t.date.slice(5)+'</span></div><span class="text-xs font-bold '+s+' shrink-0">'+(t.amount>0?'+':'')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
                 });
                 html += '</div>';
                 recentEl.innerHTML = html;
@@ -592,13 +704,12 @@
             drawTrendChart();
             drawCategoryChart();
         }
-
         function drawTrendChart() {
             const ctx = document.getElementById('trendChart').getContext('2d');
             const labels = [], incomes = [], expenses = [];
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(); d.setMonth(d.getMonth() - i);
-                const m = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                const m = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
                 labels.push(monthLabel(m));
                 const f = transactions.filter(t => t.date && t.date.startsWith(m));
                 incomes.push(f.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0));
@@ -616,15 +727,18 @@
                               x: { ticks: { font: { size: 8 } } } } }
             });
         }
-
         function drawCategoryChart() {
             const ctx = document.getElementById('categoryChart').getContext('2d');
             const m = currentMonth();
             const f = transactions.filter(t => t.date && t.date.startsWith(m) && t.amount < 0);
             const map = {};
-            f.forEach(t => { if (!map[t.category]) map[t.category] = 0; map[t.category] += Math.abs(t.amount); });
+            f.forEach(t => {
+                const main = splitCat(t.category).main || '其他';
+                if (!map[main]) map[main] = 0;
+                map[main] += Math.abs(t.amount);
+            });
             const sorted = Object.entries(map).sort((a,b) => b[1] - a[1]);
-            const colors = ['#6366f1','#f43f5e','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16'];
+            const colors = ['#6366f1','#f43f5e','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4','#a855f7','#e11d48','#d946ef','#0ea5e9','#65a30d'];
             if (catChart) catChart.destroy();
             catChart = new Chart(ctx, {
                 type: 'doughnut', data: { labels: sorted.map(([c]) => c), datasets: [{ data: sorted.map(([,v]) => v), backgroundColor: colors.slice(0, sorted.length), borderWidth: 0 }] },
@@ -642,16 +756,18 @@
             const exp = f.filter(t => t.amount < 0);
             const totalInc = inc.reduce((s,t) => s + t.amount, 0);
             const totalExp = exp.reduce((s,t) => s + Math.abs(t.amount), 0);
+
+            // 大類彙總（用 main cat）
             const incMap = {}, expMap = {};
-            inc.forEach(t => { if (!incMap[t.category]) incMap[t.category] = 0; incMap[t.category] += t.amount; });
-            exp.forEach(t => { if (!expMap[t.category]) expMap[t.category] = 0; expMap[t.category] += Math.abs(t.amount); });
+            inc.forEach(t => { const main = splitCat(t.category).main || '其他'; if (!incMap[main]) incMap[main] = 0; incMap[main] += t.amount; });
+            exp.forEach(t => { const main = splitCat(t.category).main || '其他'; if (!expMap[main]) expMap[main] = 0; expMap[main] += Math.abs(t.amount); });
 
             let html = '<div class="space-y-1.5">';
             html += '<div class="flex justify-between text-[11px] font-bold text-emerald-600 border-b pb-1"><span>收入</span><span>$'+totalInc.toLocaleString()+'</span></div>';
-            Object.entries(incMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += `<div class="flex justify-between text-[11px]"><span>${c}</span><span class="text-emerald-600">+$${v.toLocaleString()}</span></div>`; });
+            Object.entries(incMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += '<div class="flex justify-between text-[11px]"><span>'+esc(c)+'</span><span class="text-emerald-600">+$'+v.toLocaleString()+'</span></div>'; });
             html += '<div class="flex justify-between text-[11px] font-bold text-rose-500 border-b pb-1 mt-2"><span>支出</span><span>$'+totalExp.toLocaleString()+'</span></div>';
-            Object.entries(expMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += `<div class="flex justify-between text-[11px]"><span>${c}</span><span class="text-rose-500">-$${v.toLocaleString()}</span></div>`; });
-            html += `<div class="flex justify-between text-[11px] font-bold text-indigo-600 border-t pt-1 mt-2"><span>結餘</span><span>${(totalInc-totalExp) >= 0 ? '+' : ''}$${(totalInc-totalExp).toLocaleString()}</span></div>`;
+            Object.entries(expMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += '<div class="flex justify-between text-[11px]"><span>'+esc(c)+'</span><span class="text-rose-500">-$'+v.toLocaleString()+'</span></div>'; });
+            html += '<div class="flex justify-between text-[11px] font-bold text-indigo-600 border-t pt-1 mt-2"><span>結餘</span><span>'+(totalInc-totalExp >= 0 ? '+' : '')+'$'+(totalInc-totalExp).toLocaleString()+'</span></div>';
             html += '</div>';
             document.getElementById('r-summary').innerHTML = html;
 
@@ -660,14 +776,13 @@
             else {
                 let html2 = '<div class="space-y-0.5 max-h-48 overflow-y-auto no-scrollbar">';
                 f.sort((a,b) => (b.date + b.id).localeCompare(a.date + a.id)).forEach(t => {
-                    html2 += `<div class="flex justify-between items-center px-2 py-1 border-b border-slate-50"><span class="text-[10px] text-slate-400 w-14">${t.date.slice(5)}</span><span class="text-xs flex-1 min-w-0 truncate px-1">${esc(t.category)}</span><span class="text-xs font-bold ${t.amount >= 0 ? 'text-emerald-600' : 'text-rose-500'} shrink-0">${t.amount > 0 ? '+' : ''}$${Math.abs(t.amount).toLocaleString()}</span></div>`;
+                    html2 += '<div class="flex justify-between items-center px-2 py-1 border-b border-slate-50"><span class="text-[10px] text-slate-400 w-12">'+t.date.slice(5)+'</span><span class="text-xs flex-1 min-w-0 truncate px-1">'+displayCat(t.category)+'</span><span class="text-xs font-bold '+(t.amount>=0?'text-emerald-600':'text-rose-500')+' shrink-0">'+(t.amount>0?'+':'')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
                 });
                 html2 += '</div>';
                 detEl.innerHTML = html2;
             }
             drawReportChart(m, incMap, expMap);
         }
-
         function drawReportChart(m, incMap, expMap) {
             const ctx = document.getElementById('reportChart').getContext('2d');
             const labels = [...new Set([...Object.keys(incMap), ...Object.keys(expMap)])];
@@ -686,46 +801,108 @@
             });
         }
 
-        // ====== 設定 ======
-        function loadCustomCats() { try { const s = localStorage.getItem('famt_cats'); if (s) CATEGORIES = JSON.parse(s); } catch(_) {} }
+        // ====== 設定：兩階分類管理 ======
+        function loadCustomCats() {
+            try {
+                const s = localStorage.getItem('famt_cats');
+                if (s) { const c = JSON.parse(s); if (c && c.income && c.expense) CATEGORIES = c; }
+            } catch(_) {}
+        }
         function renderSettingsCats() {
-            document.getElementById('s-income-cats').innerHTML = CATEGORIES.income.map((c, i) =>
-                `<span class="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-slate-50 rounded-lg text-xs">${c}<button onclick="removeCat('income',${i})" class="text-rose-400 text-[10px] ml-1">✕</button></span>`
+            // 收入
+            document.getElementById('s-income-main').innerHTML = Object.entries(CATEGORIES.income).map(([main, subs]) =>
+                '<div class="bg-slate-50 rounded-lg p-2">'
+                + '<div class="flex items-center justify-between mb-1">'
+                + '<span class="text-xs font-bold text-emerald-700">'+esc(main)+'</span>'
+                + '<div class="flex space-x-1">'
+                + '<button onclick="openSubCats(\'income\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded font-medium">✏️</button>'
+                + '<button onclick="removeMainCat(\'income\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-500 rounded font-medium">✕</button>'
+                + '</div></div>'
+                + '<div class="flex flex-wrap gap-1">'+subs.map(s => '<span class="text-[10px] px-1.5 py-0.5 bg-white rounded border">'+esc(s)+'</span>').join('')+'</div></div>'
             ).join('');
-            document.getElementById('s-expense-cats').innerHTML = CATEGORIES.expense.map((c, i) =>
-                `<span class="inline-flex items-center space-x-1 px-2.5 py-1.5 bg-slate-50 rounded-lg text-xs">${c}<button onclick="removeCat('expense',${i})" class="text-rose-400 text-[10px] ml-1">✕</button></span>`
+
+            // 支出
+            document.getElementById('s-expense-main').innerHTML = Object.entries(CATEGORIES.expense).map(([main, subs]) =>
+                '<div class="bg-slate-50 rounded-lg p-2">'
+                + '<div class="flex items-center justify-between mb-1">'
+                + '<span class="text-xs font-bold text-rose-700">'+esc(main)+'</span>'
+                + '<div class="flex space-x-1">'
+                + '<button onclick="openSubCats(\'expense\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-600 rounded font-medium">✏️</button>'
+                + '<button onclick="removeMainCat(\'expense\',\''+escAttr(main)+'\')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-500 rounded font-medium">✕</button>'
+                + '</div></div>'
+                + '<div class="flex flex-wrap gap-1">'+subs.map(s => '<span class="text-[10px] px-1.5 py-0.5 bg-white rounded border">'+esc(s)+'</span>').join('')+'</div></div>'
             ).join('');
         }
-        function addIncomeCat() { addCat('income', 's-new-income'); }
-        function addExpenseCat() { addCat('expense', 's-new-expense'); }
-        function addCat(type, inputId) {
+        function addMainCat(type) {
+            const inputId = type === 'income' ? 's-new-income-main' : 's-new-expense-main';
             const v = document.getElementById(inputId).value.trim();
-            if (!v || CATEGORIES[type].includes(v)) return;
-            CATEGORIES[type].push(v);
+            if (!v || CATEGORIES[type][v]) return;
+            CATEGORIES[type][v] = ['新細項'];
             document.getElementById(inputId).value = '';
             saveCats(); renderSettingsCats();
         }
-        function removeCat(type, idx) { CATEGORIES[type].splice(idx, 1); saveCats(); renderSettingsCats(); }
+        function removeMainCat(type, main) {
+            if (!confirm('確定刪除大類「'+main+'」及其細項？')) return;
+            delete CATEGORIES[type][main];
+            saveCats(); renderSettingsCats();
+        }
+
+        let _subCatType = '', _subCatMain = '';
+        function openSubCats(type, main) {
+            _subCatType = type; _subCatMain = main;
+            document.getElementById('modal-subcats-title').textContent = '編輯細項：' + main;
+            renderSubCatList();
+            document.getElementById('modal-subcats-input').value = '';
+            openModal('modal-subcats');
+        }
+        function renderSubCatList() {
+            const subs = getSubCats(_subCatType, _subCatMain);
+            document.getElementById('modal-subcats-list').innerHTML = subs.map((s, i) =>
+                '<div class="flex items-center justify-between bg-slate-50 rounded-lg px-2.5 py-1.5">'
+                + '<span class="text-xs">'+esc(s)+'</span>'
+                + '<button onclick="removeSubCat('+i+')" class="text-[10px] px-1.5 py-0.5 bg-rose-100 text-rose-500 rounded font-medium">✕</button></div>'
+            ).join('');
+        }
+        function addSubCatFromModal() {
+            const v = document.getElementById('modal-subcats-input').value.trim();
+            if (!v || CATEGORIES[_subCatType][_subCatMain].includes(v)) return;
+            CATEGORIES[_subCatType][_subCatMain].push(v);
+            document.getElementById('modal-subcats-input').value = '';
+            renderSubCatList();
+            saveCatsDelayed();
+        }
+        function removeSubCat(idx) {
+            CATEGORIES[_subCatType][_subCatMain].splice(idx, 1);
+            renderSubCatList();
+            saveCatsDelayed();
+        }
+        let _saveCatsTimer = null;
+        function saveCatsDelayed() {
+            if (_saveCatsTimer) clearTimeout(_saveCatsTimer);
+            _saveCatsTimer = setTimeout(saveCats, 500);
+        }
         async function saveCats() {
             localStorage.setItem('famt_cats', JSON.stringify(CATEGORIES));
             try { await apiPost('/api/settings', { categories: CATEGORIES }); } catch(_) {}
         }
 
-        // ====== CSV / PDF ======
+        // ====== CSV ======
         function exportCSV() {
             const m = document.getElementById('r-month').value;
             const f = transactions.filter(t => t.date && t.date.startsWith(m));
             if (!f.length) { showToast('本月無資料'); return; }
-            const rows = f.map(t => `${t.date},${t.amount >= 0 ? '收入' : '支出'},${t.category},${t.amount},${t.note || ''}`).join('\n');
-            const blob = new Blob(['\uFEFF日期,類別,分類,金額,備註\n' + rows], { type: 'text/csv;charset=utf-8;' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `收支報表_${m}.csv`; a.click();
+            const rows = f.map(t => t.date + ',' + (t.amount >= 0 ? '收入' : '支出') + ',' + t.category + ',' + t.amount + ',' + (t.note || '')).join('\\n');
+            const blob = new Blob(['\\uFEFF日期,類別,分類(大類/細項),金額,備註\\n' + rows], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '收支報表_'+m+'.csv'; a.click();
             showToast('✅ CSV 已下載');
         }
+
+        // ====== PDF ======
         function exportPDF() {
             const el = document.getElementById('content-reports');
             if (!el.classList.contains('active')) switchTab('reports');
             setTimeout(() => {
-                html2pdf().set({ margin: [8,8,8,8], filename: `收支報表_${document.getElementById('r-month').value}.pdf`, image: { type: 'jpeg', quality: .95 }, html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save().then(() => showToast('✅ PDF 已下載'));
+                html2pdf().set({ margin: [8,8,8,8], filename: '收支報表_'+document.getElementById('r-month').value+'.pdf', image: { type: 'jpeg', quality: .95 }, html2canvas: { scale: 2, useCORS: true, logging: false }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save().then(() => showToast('✅ PDF 已下載'));
             }, 600);
         }
 
@@ -733,7 +910,7 @@
         function exportJSON() {
             const data = { transactions, budgets, categories: CATEGORIES, exportedAt: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(data, null)], { type: 'application/json' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `備份_${today()}.json`; a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = '備份_'+today()+'.json'; a.click();
             showToast('✅ 備份已下載');
         }
         async function importJSON(e) {
@@ -772,8 +949,15 @@
             el._timer = setTimeout(() => { el.classList.add('opacity-0', 'scale-90'); el.classList.remove('opacity-100', 'scale-100'); }, 2200);
         }
 
+        // ====== 安全轉義 ======
+        function esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+        function escAttr(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        // ====== 自動渲染 ======
+        function renderAll() { renderDashboard(); renderTxTable(); renderBudgets(); renderReport(); }
+
         // ====== 🤖 AI 智慧記帳（多筆 + 語音 + OCR） ======
-        let _aiResults = []; // [{ type, category, amount, note }, ...]
+        let _aiResults = [];
         let _confirmedCount = 0;
 
         async function parseAIInput() {
@@ -783,17 +967,12 @@
             renderAIPreview();
         }
 
-        /** 將整段文字拆成多筆，每筆是「品項+金額」 */
         async function aiParseMulti(text) {
-            // Step 1: 用 數字 當分隔點，把文字拆成 (中文/品項, 數字) 配對
-            // 支援格式：牛排120、牛排 120、牛排$120、水果50、搭高鐵1490
             const segments = [];
-            // 正則：匹配任何「非數字字串 + 數字」的組合，從頭吃到尾
-            // 用 lookahead 找每個 (中文+數字) 配對
-            const regex = /([\u4e00-\u9fff\w\s]+?)\s*[\$¥]?\s*(\d[\d,]*\.?\d*)\s*(k|千|萬|百)?/gi;
+            const regex = /([\\u4e00-\\u9fff\\w\\s]+?)\\s*[\\$¥]?\\s*(\\d[\\d,]*\\.?\\d*)\\s*(k|千|萬|百)?/gi;
             let match;
             while ((match = regex.exec(text)) !== null) {
-                let name = match[1].trim().replace(/[＋\+$]/g, '').trim();
+                let name = match[1].trim().replace(/[＋\\+$]/g, '').trim();
                 let amount = parseFloat(match[2].replace(/,/g, ''));
                 const unit = (match[3] || '').toLowerCase();
                 if (unit === 'k' || unit === '千') amount *= 1000;
@@ -803,101 +982,89 @@
                 segments.push({ name, amount });
             }
 
-            // 如果正則沒找到，退回到原本的單筆模式
             if (segments.length === 0) {
                 const single = await aiParseSingle(text);
                 if (single) segments.push(single);
             }
 
-            // Step 2: 每個 segment 套用分類
-            const results = [];
-            for (const s of segments) {
-                const result = await classifyItem(s.name, s.amount);
-                results.push({
-                    type: result.type,
-                    category: result.category,
-                    source: result.source,
-                    amount: s.amount,
-                    note: s.name,
-                    _key: Math.random().toString(36).slice(2, 8)
-                });
-            }
-            return results;
-        }
-
-        /** 單筆解析（舊版邏輯） */
-        async function aiParseSingle(text) {
-            const numMatch = text.match(/(\d[\d,]*\.?\d*)\s*(k|千|萬|百)?/i);
-            if (!numMatch) return null;
-            let amount = parseFloat(numMatch[1].replace(/,/g, ''));
-            const unit = (numMatch[2] || '').toLowerCase();
-            if (unit === 'k' || unit === '千') amount *= 1000;
-            else if (unit === '萬') amount *= 10000;
-            else if (unit === '百') amount *= 100;
-
-            let name = text.replace(numMatch[0], '').replace(/[＋\+$]/g, '').trim();
-            if (!name) name = amount >= 10000 ? '收入' : '支出';
-            const r = await classifyItem(name, amount);
-            return { name, amount: r.type === 'income' ? amount : amount };
-        }
-
-        /** 根據品項名稱判斷收入/支出 + 分類（支援 Gemini AI） */
-        async function classifyItem(name, amount) {
+            // 用 AI 或規則分類
             const geminiKey = localStorage.getItem('famt_gemini_key');
-            if (geminiKey) {
-                try {
-                    const result = await classifyWithGemini(name, geminiKey);
-                    if (result) return { ...result, source: 'ai' };
-                } catch(e) { /* fallback to rule-based */ }
+            for (const seg of segments) {
+                const classified = geminiKey
+                    ? await classifyWithGemini(seg.name, geminiKey)
+                    : classifyByRule(seg.name);
+                if (classified) {
+                    seg.type = classified.type;
+                    seg.category = classified.category;
+                } else {
+                    seg.type = seg.amount < 0 || text.includes('支出') ? 'expense' : (seg.amount > 5000 ? 'income' : 'expense');
+                    const { main, sub } = seg.type === 'income' ? { main:'其他收入', sub:'其他收入' } : { main:'其他', sub:'雜費' };
+                    seg.category = catPath(main, sub);
+                }
             }
-            // 規則比對（fallback）
-            const incomeKeywords = ['薪資','薪水','工資','獎金','年終','分紅','投資','股息','利息','股利','租金','兼職','接案','收入','紅包','禮金'];
-            const isIncome = incomeKeywords.some(k => name.includes(k));
-            const type = isIncome ? 'income' : 'expense';
-
-            const catMap = {
-                '餐飲|外食|牛排|便當|麵|飯|火鍋|燒烤|早餐|午餐|晚餐|宵夜|飲料|咖啡|手搖|麥當勞|肯德基|subway|爭鮮|吃到飽|小吃|餐廳|美食|速食|日料|壽司|拉麵|滷味|鹹酥雞|雞排|珍奶|豆漿|饅頭|漢堡|pizza|披薩|蘋果|水果|魚肉|肉': '餐飲/外食',
-                '超市|全聯|家樂福|costco|好市多|頂好|菜市場|買菜|購物|日用品|雜貨|蝦皮|pchome|網購|團購|採買|衛生紙|洗髮精|沐浴乳|洗衣': '日常採買',
-                '交通|高鐵|台鐵|捷運|公車|ubike|youbike|計程車|uber|taxi|機車|汽車|加油|停車|過路費|etc|月票|車票|油錢': '交通',
-                '水電|電費|水費|瓦斯|天然氣|管理費|第四台|網路費|房租|房貸|租屋|住宿|旅館': '居住/水電',
-                '娛樂|電影|netflix|spotify|遊戲|steam|手遊|課金|演唱會|ktv|遊樂園|旅遊|露營|滑雪|潛水': '娛樂',
-                '醫療|掛號|診所|醫院|藥局|看醫生|牙醫|眼科|中醫|復健|健檢|檢查|疫苗|藥': '醫療',
-                '教育|學費|補習|課程|線上課程|書|參考書|家教|文具': '教育',
-                '通訊|手機|電信|月租費|通話費|上網': '通訊',
-                '保險|勞保|健保|壽險|醫療險|車險|保費': '保險'
-            };
-            const incomeCatMap = {
-                '薪資|薪水|月薪|底薪': '薪資',
-                '獎金|年終|分紅|績效|三節': '獎金',
-                '投資|股息|股利|利息|股票|基金|配息': '投資收益',
-                '兼職|接案|freelance|打工|時薪|外送': '兼職收入',
-                '租金|房租收入|出租': '兼職收入',
-                '紅包|禮金|過年|壓歲錢': '紅包/禮金'
-            };
-
-            const map = type === 'income' ? incomeCatMap : catMap;
-            let cat = '';
-            for (const [pattern, c] of Object.entries(map)) {
-                if (new RegExp(pattern, 'i').test(name)) { cat = c; break; }
-            }
-            if (!cat) cat = CATEGORIES[type][0] || (type === 'income' ? '其他收入' : '其他支出');
-
-            return { type, category: cat, source: 'rule' };
+            return segments;
         }
 
-        /** 用 Gemini AI 分類 */
+        async function aiParseSingle(text) {
+            const trimmed = text.replace(/^[\\s,，]+/, '').replace(/[\\s,，]+$/, '').trim();
+            if (!trimmed) return null;
+
+            // 試著從結尾抓數字
+            const m = trimmed.match(/^(.+?)\\s*(\\d[\\.\\d]*)$/);
+            if (m) {
+                const name = m[1].trim();
+                const amount = parseFloat(m[2]);
+                return { name, amount };
+            }
+            return null;
+        }
+
+        /** 關鍵字規則分類（兩階版） */
+        function classifyByRule(name) {
+            const kw = name.toLowerCase();
+            // 先試收入關鍵字
+            for (const [main, subs] of Object.entries(CATEGORIES.income)) {
+                for (const sub of subs) {
+                    if (kw.includes(sub)) return { type: 'income', category: catPath(main, sub) };
+                }
+            }
+            // 再試支出
+            for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
+                for (const sub of subs) {
+                    if (kw.includes(sub)) return { type: 'expense', category: catPath(main, sub) };
+                }
+            }
+            // 特殊規則
+            if (/薪水|薪資|薪|月薪|工資/.test(kw)) return { type: 'income', category: catPath('工作收入', '薪資') };
+            if (/獎金|年終/.test(kw)) return { type: 'income', category: catPath('獎金', '年終獎金') };
+            if (/外食|餐廳|便當|麵|飯|餐|小吃|早午餐|晚餐|午餐|早餐|宵夜/.test(kw)) return { type: 'expense', category: catPath('飲食', '外食') };
+            if (/食材|菜市場|超市|全聯|家樂福|菜|肉|米/.test(kw)) return { type: 'expense', category: catPath('飲食', '食材') };
+            if (/加油|油錢|汽油/.test(kw)) return { type: 'expense', category: catPath('交通運輸', '汽機車油錢') };
+            if (/停車/.test(kw)) return { type: 'expense', category: catPath('交通運輸', '汽機車停車') };
+            if (/捷運|公車|火車|高鐵|bus|MRT|台鐵/.test(kw)) return { type: 'expense', category: catPath('交通運輸', '大眾運輸') };
+            if (/水費|水/.test(kw) && !/油/.test(kw)) return { type: 'expense', category: catPath('水電通訊', '水') };
+            if (/電費|電/.test(kw)) return { type: 'expense', category: catPath('水電通訊', '電') };
+            if (/瓦斯/.test(kw)) return { type: 'expense', category: catPath('水電通訊', '瓦斯') };
+            if (/電話|手機|電信/.test(kw)) return { type: 'expense', category: catPath('水電通訊', '電信') };
+            if (/網路|寬頻/.test(kw)) return { type: 'expense', category: catPath('水電通訊', '寬頻網路') };
+            if (/租金|房租/.test(kw)) return { type: 'expense', category: catPath('居住', '房屋租金') };
+            if (/貸款|房貸/.test(kw)) return { type: 'expense', category: catPath('居住', '房屋貸款') };
+            if (/管理費/.test(kw)) return { type: 'expense', category: catPath('居住', '大樓管理費') };
+            if (/保險/.test(kw)) return { type: 'expense', category: catPath('保險與退休', '人壽保險') };
+            if (/健保/.test(kw)) return { type: 'expense', category: catPath('保險與退休', '健保') };
+            if (/醫療|醫院|診所|藥/.test(kw)) return { type: 'expense', category: catPath('醫療', '健保醫療') };
+            if (/娛樂|電影|遊戲|Netflix/.test(kw)) return { type: 'expense', category: catPath('休閒與社交', '休閒娛樂') };
+            if (/捐款|公益/.test(kw)) return { type: 'expense', category: catPath('休閒與社交', '捐款') };
+
+            return null;
+        }
+
+        /** Gemini AI 分類（兩階版） */
         async function classifyWithGemini(name, apiKey) {
-            const incomeCats = CATEGORIES.income.join('、');
-            const expenseCats = CATEGORIES.expense.join('、');
-            const prompt = `你是一個家庭記帳分類助手。請判斷「${name}」是收入還是支出，並從以下分類中選一個最適合的分類。
-如果沒有完全匹配的分類，選最接近的。請只回傳 JSON，不要任何其他文字。
+            const incomeDesc = Object.entries(CATEGORIES.income).map(([m, subs]) => m + '：' + subs.join('、')).join('；');
+            const expenseDesc = Object.entries(CATEGORIES.expense).map(([m, subs]) => m + '：' + subs.join('、')).join('；');
+            const prompt = '你是一個家庭記帳分類助手。請判斷「'+name+'」是收入還是支出，並從以下兩階分類中選出最適合的「大類/細項」。\\n\\n收入分類：'+incomeDesc+'\\n\\n支出分類：'+expenseDesc+'\\n\\n請只回傳 JSON，格式：{"type":"income/expense","main":"大類","sub":"細項"}';
 
-收入分類：${incomeCats}
-支出分類：${expenseCats}
-
-回傳格式：{"type": "income" 或 "expense", "category": "分類名稱"}`;
-
-            // 嘗試多個模型：優先使用儲存的模型，否則依序嘗試
             const models = [
                 localStorage.getItem('famt_gemini_model') || 'gemini-2.5-flash-lite',
                 'gemini-2.5-flash-lite',
@@ -909,28 +1076,121 @@
                 if (tried.has(model)) continue;
                 tried.add(model);
                 try {
-                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                    const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { temperature: 0.1, maxOutputTokens: 100 }
-                        })
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 200 } })
                     });
                     if (!r.ok) continue;
                     const data = await r.json();
                     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    const json = text.match(/\{.*\}/s);
+                    const json = text.match(/\\{[\\s\\S]*\\}/);
                     if (!json) continue;
                     const parsed = JSON.parse(json[0]);
-                    if (parsed.type && parsed.category) {
-                        // 記住可用模型
+                    if (parsed.type && parsed.main && parsed.sub) {
                         localStorage.setItem('famt_gemini_model', model);
-                        return { type: parsed.type, category: parsed.category };
+                        return { type: parsed.type, category: catPath(parsed.main, parsed.sub) };
                     }
                 } catch(e) { continue; }
             }
             return null;
+        }
+
+        function renderAIPreview() {
+            const el = document.getElementById('ai-preview');
+            if (!_aiResults.length) { el.classList.add('hidden'); return; }
+            el.classList.remove('hidden');
+            let html = '<div class="text-[10px] font-bold text-indigo-600 mb-1.5">📋 預覽（勾選要送出的項目）</div>';
+            _aiResults.forEach((r, i) => {
+                const isIncome = r.type === 'income' || r.amount > 0;
+                html += '<label class="flex items-center space-x-2 bg-white rounded-lg px-2.5 py-2 border border-slate-100 active:bg-slate-50">'
+                    + '<input type="checkbox" checked id="ai-chk-'+i+'" class="accent-indigo-600 shrink-0">'
+                    + '<div class="flex-1 min-w-0">'
+                    + '<div class="flex items-center space-x-1">'
+                    + '<span class="text-xs font-medium truncate">'+esc(r.name)+'</span>';
+                if (r.source === 'ai') html += '<span class="text-[9px] px-1 py-0.5 rounded bg-purple-100 text-purple-600">🤖AI</span>';
+                else html += '<span class="text-[9px] px-1 py-0.5 rounded bg-slate-100 text-slate-500">📖規則</span>';
+                html += '</div>'
+                    + '<p class="text-[10px] text-slate-500">'+displayCat(r.category)+' · '+(isIncome ? '💵收入' : '💸支出')+'</p></div>'
+                    + '<span class="text-xs font-bold '+(isIncome?'text-emerald-600':'text-rose-500')+' shrink-0">'+(isIncome?'+':'')+'$'+Math.abs(r.amount).toLocaleString()+'</span></label>';
+            });
+            html += '<button onclick="confirmCheckedAI()" class="touch-btn w-full py-2 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">✅ 送出勾選項目</button>';
+            el.innerHTML = html;
+        }
+
+        function clearAI() {
+            document.getElementById('ai-preview').classList.add('hidden');
+            document.getElementById('ai-input').value = '';
+            _aiResults = [];
+            _confirmedCount = 0;
+        }
+
+        async function confirmCheckedAI() {
+            const checked = Array.from(document.querySelectorAll('[id^="ai-chk-"]:checked'));
+            if (!checked.length) { showToast('⚠️ 請勾選要送出的項目'); return; }
+            const valid = checked.map(cb => _aiResults[parseInt(cb.id.replace('ai-chk-', ''))]).filter(r => r && r.amount > 0 && r.category);
+            if (!valid.length) { showToast('⚠️ 沒有有效項目'); return; }
+            let ok = 0, fail = 0;
+            for (const r of valid) {
+                try {
+                    const isIncome = r.type === 'income' || r.amount > 0;
+                    await apiPost('/api/transactions', {
+                        date: today(),
+                        type: isIncome ? 'income' : 'expense',
+                        category: r.category,
+                        amount: r.amount,
+                        note: r.name
+                    });
+                    ok++;
+                } catch(e) { fail++; }
+            }
+            showToast('✅ '+ok+' 筆已送出'+(fail ? '，'+fail+' 筆失敗' : ''));
+            clearAI();
+            await loadFromCloud();
+            renderTxTable();
+        }
+
+        // ====== 🎤 語音輸入 ======
+        let _aiRecognition = null;
+        function startAIVoice() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { showToast('⚠️ 此瀏覽器不支援語音'); return; }
+            if (_aiRecognition && _aiRecognition._running) { _aiRecognition.stop(); return; }
+            const rec = new SpeechRecognition();
+            rec.lang = 'zh-TW';
+            rec.continuous = false;
+            rec.interimResults = true;
+            rec.onresult = ev => {
+                let text = '';
+                for (let i = ev.resultIndex; i < ev.results.length; i++) text += ev.results[i][0].transcript;
+                document.getElementById('ai-input').value = text;
+            };
+            rec.onend = () => { rec._running = false; };
+            rec._running = true;
+            rec.start();
+        }
+
+        // ====== 📷 OCR ======
+        async function ocrImage(input) {
+            const file = input.files[0]; if (!file) return;
+            document.getElementById('ai-ocr-loading').classList.remove('hidden');
+            try {
+                if (typeof Tesseract === 'undefined') {
+                    showToast('⚠️ OCR 引擎尚未載入');
+                    document.getElementById('ai-ocr-loading').classList.add('hidden');
+                    return;
+                }
+                const { data: { text } } = await Tesseract.recognize(file, 'chi_tra', { logger: m => {
+                    if (m.status === 'recognizing text') {
+                        document.getElementById('ai-ocr-loading').textContent = '🔍 OCR 辨識中 ' + Math.round(m.progress * 100) + '%';
+                    }
+                }});
+                document.getElementById('ai-input').value = text.trim();
+                showToast('✅ OCR 完成');
+                parseAIInput();
+            } catch(e) { showToast('⚠️ OCR 失敗'); }
+            document.getElementById('ai-ocr-loading').classList.add('hidden');
+            input.value = '';
         }
 
         // ====== 🤖 Gemini API Key 管理 ======
@@ -961,230 +1221,28 @@
         async function testGeminiKey() {
             const key = document.getElementById('s-gemini-key').value.trim();
             if (!key) { showToast('請先輸入 API Key'); return; }
-            const statusEl = document.getElementById('ai-status');
-            const detailEl = document.getElementById('ai-status-detail');
-            statusEl.textContent = '🔌 測試中...';
-            statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-amber-100 text-amber-600';
-            detailEl.classList.add('hidden');
+            const statusEl = document.getElementById('ai-status-detail');
+            statusEl.classList.remove('hidden');
+            statusEl.textContent = '⏳ 測試中...';
             try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`, {
+                const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key='+key, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: '回傳"ok"' }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 20 } })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: '回傳OK' }] }], generationConfig: { maxOutputTokens: 5 } })
                 });
-                const data = await r.json();
-                if (r.ok && data?.candidates) {
-                    statusEl.textContent = '✅ 連線成功！（gemini-2.5-flash-lite）';
-                    statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600';
-                    detailEl.classList.add('hidden');
-                    localStorage.setItem('famt_gemini_key', key);
-                    localStorage.setItem('famt_gemini_model', 'gemini-2.5-flash-lite');
+                if (res.ok) {
+                    statusEl.textContent = '';
+                    statusEl.classList.add('hidden');
+                    showToast('✅ 連線成功！（gemini-2.5-flash-lite）');
                 } else {
-                    const err = data?.error?.message || data?.error?.status || JSON.stringify(data);
-                    statusEl.textContent = '❌ API 錯誤';
-                    statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-rose-100 text-rose-600';
-                    detailEl.textContent = err;
-                    detailEl.classList.remove('hidden');
-                    console.error('Gemini API error:', data);
+                    const err = await res.json();
+                    statusEl.textContent = '❌ ' + (err?.error?.message || 'HTTP ' + res.status);
+                    statusEl.className = 'text-[10px] text-rose-600 bg-rose-50 rounded-lg px-2.5 py-2 leading-relaxed break-words';
                 }
             } catch(e) {
-                statusEl.textContent = '❌ 網路錯誤';
-                statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-rose-100 text-rose-600';
-                detailEl.textContent = e.message;
-                detailEl.classList.remove('hidden');
-                console.error('Gemini test failed:', e);
+                statusEl.textContent = '❌ ' + e.message;
             }
         }
-
-        function renderAIPreview() {
-            const el = document.getElementById('ai-preview');
-            if (!_aiResults.length) { el.classList.add('hidden'); return; }
-            el.classList.remove('hidden');
-
-            const total = _aiResults.length;
-            let html = `<div class="bg-white rounded-lg p-2.5 border border-indigo-100 shadow-sm space-y-1.5">
-                <div class="flex justify-between items-center">
-                    <span class="text-[11px] font-bold text-slate-600">📋 共 ${total} 筆
-                        <span id="ai-selected-count" class="text-[10px] text-indigo-500 ml-1">（全選）</span></span>
-                    <div class="flex space-x-1.5">
-                        <button onclick="toggleAllCheck()" class="px-2 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-medium active:bg-slate-200 transition">🔁 全選/取消</button>
-                        <button onclick="confirmCheckedAI()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold active:bg-emerald-200 transition">✅ 送出選取</button>
-                        <button onclick="clearAI()" class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-[10px] active:bg-slate-200 transition">✕</button>
-                    </div>
-                </div>`;
-
-            _aiResults.forEach((r, i) => {
-                const icon = r.type === 'income' ? '💵' : '💸';
-                const color = r.type === 'income' ? 'text-emerald-600' : 'text-rose-500';
-                const bgColor = r.type === 'income' ? 'bg-emerald-50' : 'bg-rose-50';
-                const sourceBadge = r.source === 'ai'
-                    ? '<span class="text-[9px] text-indigo-400 ml-1">🤖AI</span>'
-                    : '<span class="text-[9px] text-slate-300 ml-1">📖規則</span>';
-                html += `<div class="${bgColor} rounded-lg px-2 py-1.5 flex items-center justify-between">
-                    <div class="flex items-center space-x-2 min-w-0">
-                        <input type="checkbox" id="ai-chk-${i}" checked onchange="updateSelectedCount()" class="w-4 h-4 rounded accent-indigo-600 shrink-0">
-                        <span class="text-xs">${icon}</span>
-                        <span class="text-[10px] font-medium text-slate-500">${r.category}</span>
-                        ${sourceBadge}
-                        <span class="text-[10px] text-slate-400 truncate">${r.note}</span>
-                    </div>
-                    <span class="text-xs font-bold ${color} shrink-0">${r.type === 'income' ? '+' : '-'}$${r.amount.toLocaleString()}</span>
-                </div>`;
-            });
-
-            html += '</div>';
-            el.innerHTML = html;
-        }
-
-        function updateSelectedCount() {
-            const total = _aiResults.length;
-            const checked = document.querySelectorAll('[id^="ai-chk-"]:checked').length;
-            const el = document.getElementById('ai-selected-count');
-            if (el) el.textContent = checked === total ? '（全選）' : `（選 ${checked}/${total}）`;
-        }
-
-        function toggleAllCheck() {
-            const boxes = document.querySelectorAll('[id^="ai-chk-"]');
-            const allChecked = Array.from(boxes).every(b => b.checked);
-            boxes.forEach(b => b.checked = !allChecked);
-            updateSelectedCount();
-        }
-
-        function clearAI() {
-            document.getElementById('ai-preview').classList.add('hidden');
-            document.getElementById('ai-input').value = '';
-            _aiResults = [];
-            _confirmedCount = 0;
-        }
-
-        async function confirmCheckedAI() {
-            const checked = Array.from(document.querySelectorAll('[id^="ai-chk-"]:checked'));
-            if (!checked.length) { showToast('⚠️ 請勾選要送出的項目'); return; }
-
-            const valid = checked.map(cb => _aiResults[parseInt(cb.id.replace('ai-chk-', ''))]).filter(r => r && r.amount > 0);
-            if (!valid.length) { showToast('⚠️ 沒有有效項目'); return; }
-
-            let ok = 0, fail = 0;
-            for (const r of valid) {
-                try {
-                    await apiPost('/api/transactions', {
-                        date: today(),
-                        type: r.type,
-                        category: r.category,
-                        amount: r.amount,
-                        note: r.note
-                    });
-                    ok++;
-                } catch(e) { fail++; }
-            }
-            showToast(`✅ ${ok} 筆已送出${fail ? `，${fail} 筆失敗` : ''}`);
-            clearAI();
-            await loadFromCloud();
-            renderTxTable();
-        }
-
-        // ====== 🎤 語音輸入 ======
-        let _aiRecognition = null;
-        function startAIVoice() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { showToast('⚠️ 此瀏覽器不支援語音'); return; }
-
-            if (_aiRecognition && _aiRecognition._running) {
-                _aiRecognition.stop();
-                return;
-            }
-
-            const rec = new SpeechRecognition();
-            rec.lang = 'zh-TW';
-            rec.continuous = false;
-            rec.interimResults = true;
-
-            const micBtn = document.getElementById('ai-mic-btn');
-            micBtn.textContent = '🔴';
-            micBtn.style.color = '#ef4444';
-            rec._running = true;
-            _aiRecognition = rec;
-
-            rec.onresult = (e) => {
-                const last = e.results.length - 1;
-                const transcript = e.results[last][0].transcript;
-                document.getElementById('ai-input').value = transcript;
-                if (e.results[last].isFinal) {
-                    rec.stop();
-                    parseAIInput();
-                }
-            };
-
-            rec.onend = () => {
-                micBtn.textContent = '🎤';
-                micBtn.style.color = '';
-                rec._running = false;
-            };
-
-            rec.onerror = () => {
-                micBtn.textContent = '🎤';
-                micBtn.style.color = '';
-                rec._running = false;
-                showToast('⚠️ 語音辨識失敗');
-            };
-
-            try { rec.start(); } catch(_) { showToast('⚠️ 語音啟動失敗'); }
-        }
-
-        // ====== 📷 OCR 拍照辨識 ======
-        function ocrImage(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            document.getElementById('ai-ocr-loading').classList.remove('hidden');
-
-            // 用 Tesseract.js CDN 做 OCR
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const imgData = e.target.result;
-                try {
-                    // 動態載入 Tesseract
-                    if (typeof Tesseract === 'undefined') {
-                        await loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
-                    }
-                    const { data } = await Tesseract.recognize(imgData, 'chi_tra', {
-                        logger: m => {
-                            if (m.status === 'recognizing text') {
-                                const pct = Math.round(m.progress * 100);
-                                document.getElementById('ai-ocr-loading').textContent = `🔍 OCR 辨識中... ${pct}%`;
-                            }
-                        }
-                    });
-                    document.getElementById('ai-ocr-loading').classList.add('hidden');
-                    const text = data.text.trim();
-                    if (!text) { showToast('⚠️ 無法辨識內容'); return; }
-                    document.getElementById('ai-input').value = text;
-                    parseAIInput();
-                    showToast('✅ OCR 完成！');
-                } catch(err) {
-                    document.getElementById('ai-ocr-loading').classList.add('hidden');
-                    showToast('⚠️ OCR 失敗');
-                    console.error(err);
-                }
-            };
-            reader.readAsDataURL(file);
-            // Reset input so same file can be picked again
-            input.value = '';
-        }
-
-        function loadScript(url) {
-            return new Promise((resolve, reject) => {
-                const s = document.createElement('script');
-                s.src = url;
-                s.onload = resolve;
-                s.onerror = reject;
-                document.head.appendChild(s);
-            });
-        }
-
-        // ====== 統整 ======
-        function renderAll() { renderTxCats(); renderDashboard(); renderTxTable(); renderBudgets(); }
-        function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     </script>
 </body>
 </html>

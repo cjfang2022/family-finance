@@ -130,9 +130,19 @@ def get_transactions():
         return {"success": True, "data": []}
 
     result = []
-    for row in rows[1:]:
+    updates = {}  # row_index -> [id, createdAt]
+    for i, row in enumerate(rows[1:], start=2):  # sheet row index (1-based)
+        # 自動補上空白 ID 和建立時間
         if not row[0]:
-            continue
+            row[0] = str(int(datetime.now().timestamp() * 1000)) + "_" + os.urandom(3).hex()
+            row[6] = datetime.now().isoformat()
+            updates[i] = [row[0], row[6]]
+        if not row[6]:
+            now = datetime.now().isoformat()
+            row[6] = now
+            if i not in updates:
+                updates[i] = [row[0], now]
+
         result.append({
             "id": row[0],
             "date": row[1],
@@ -142,6 +152,16 @@ def get_transactions():
             "note": row[5] if len(row) > 5 else "",
             "createdAt": row[6] if len(row) > 6 else "",
         })
+
+    # 如果有缺 ID 或建立時間的列，寫回 Sheets 補上
+    if updates:
+        try:
+            for row_idx, (new_id, new_ct) in updates.items():
+                tx_sheet.update_cell(row_idx, 1, new_id)   # column A = ID
+                tx_sheet.update_cell(row_idx, 7, new_ct)   # column G = 建立時間
+        except Exception:
+            pass  # 補寫失敗不影響回傳結果
+
     return {"success": True, "data": result}
 
 
@@ -150,7 +170,7 @@ def add_transaction(tx: TransactionIn):
     tx_sheet, _ = ensure_sheets()
     tx_id = tx.id or str(int(datetime.now().timestamp() * 1000)) + "_" + os.urandom(3).hex()
     now = datetime.now().isoformat()
-    amount = -abs(tx.amount) if tx.type == "expense" else abs(tx.amount)
+    amount = tx.amount
 
     # Insert at row 2 (below header)
     tx_sheet.insert_row([tx_id, tx.date, tx.type, tx.category, amount, tx.note, now], 2)
@@ -173,8 +193,7 @@ def update_transaction(tx: TransactionUpdate):
     if row_idx is None:
         raise HTTPException(404, "找不到該筆紀錄")
 
-    sign = 1 if old_amount >= 0 else -1
-    new_amount = (abs(tx.amount) * sign) if tx.amount is not None else old_amount
+    new_amount = tx.amount if tx.amount is not None else old_amount
 
     tx_sheet.update(f"B{row_idx}:F{row_idx}", [[
         tx.date or rows[row_idx - 1][1],
@@ -202,6 +221,27 @@ def delete_transaction(tx: TransactionDelete):
 
     tx_sheet.delete_rows(row_idx)
     return {"success": True}
+
+
+@app.get("/api/sync-version")
+def get_sync_version():
+    """快速回傳資料版號（輕量，不下載所有資料）"""
+    tx_sheet, _ = ensure_sheets()
+    rows = tx_sheet.get_all_values()
+    # 根據資料列數 + 最後一筆 row 內容算 hash
+    if len(rows) <= 1:
+        return {"success": True, "version": "0", "count": 0}
+
+    data_rows = rows[1:]
+    # 用記錄數 + 最後一筆的 ID + 最後修改時間來判斷
+    last_id = data_rows[-1][0] if data_rows and data_rows[-1][0] else ""
+    last_date = data_rows[-1][1] if data_rows and len(data_rows[-1]) > 1 else ""
+    count = len(data_rows)
+    # 簡單但足夠的版號
+    import hashlib
+    raw = f"{count}|{last_id}|{last_date}"
+    version = hashlib.md5(raw.encode()).hexdigest()[:12]
+    return {"success": True, "version": version, "count": count}
 
 
 @app.get("/api/budgets")
