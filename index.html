@@ -22,8 +22,8 @@
         .animate-in { animation: fadeIn .25s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         /* 讓圖表在小螢幕不失真 */
-        .chart-wrap { position: relative; width: 100%; max-height: 200px; }
-        .chart-wrap canvas { max-height: 200px !important; }
+        .chart-wrap { position: relative; width: 100%; height: 180px; }
+        .chart-wrap canvas { max-height: 180px !important; max-width: 100% !important; }
         /* 觸控友善間距 */
         .touch-btn { min-height: 44px; }
         @media print { .no-print { display: none !important; } body { background: #fff !important; } }
@@ -498,7 +498,7 @@
                     { label: '收入', data: incomes, backgroundColor: '#10b981', borderRadius: 6, barPercentage: .7 },
                     { label: '支出', data: expenses, backgroundColor: '#f43f5e', borderRadius: 6, barPercentage: .7 }
                 ]},
-                options: { responsive: true, maintainAspectRatio: true, aspectRatio: 1.8,
+                options: { responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 8, font: { size: 9 } } } },
                     scales: { y: { beginAtZero: true, ticks: { font: { size: 9 }, callback: v => v >= 1000 ? (v/1000)+'k' : v } },
                               x: { ticks: { font: { size: 8 } } } } }
@@ -516,7 +516,7 @@
             if (catChart) catChart.destroy();
             catChart = new Chart(ctx, {
                 type: 'doughnut', data: { labels: sorted.map(([c]) => c), datasets: [{ data: sorted.map(([,v]) => v), backgroundColor: colors.slice(0, sorted.length), borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: true, aspectRatio: 1.6,
+                options: { responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, padding: 6, font: { size: 8 } } } },
                     cutout: '55%' }
             });
@@ -567,7 +567,7 @@
                     { label: '收入', data: incData, backgroundColor: '#10b981', borderRadius: 4, barPercentage: .7 },
                     { label: '支出', data: expData, backgroundColor: '#f43f5e', borderRadius: 4, barPercentage: .7 }
                 ]},
-                options: { responsive: true, maintainAspectRatio: true, aspectRatio: 1.6, indexAxis: 'y',
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y',
                     plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 6, font: { size: 9 } } } },
                     scales: { x: { ticks: { font: { size: 8 }, callback: v => v >= 1000 ? (v/1000)+'k' : v } },
                               y: { ticks: { font: { size: 8 } } } } }
