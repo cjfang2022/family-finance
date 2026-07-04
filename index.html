@@ -747,6 +747,7 @@
                 results.push({
                     type: result.type,
                     category: result.category,
+                    source: result.source,
                     amount: s.amount,
                     note: s.name,
                     _key: Math.random().toString(36).slice(2, 8)
@@ -777,7 +778,7 @@
             if (geminiKey) {
                 try {
                     const result = await classifyWithGemini(name, geminiKey);
-                    if (result) return result;
+                    if (result) return { ...result, source: 'ai' };
                 } catch(e) { /* fallback to rule-based */ }
             }
             // 規則比對（fallback）
@@ -812,7 +813,7 @@
             }
             if (!cat) cat = CATEGORIES[type][0] || (type === 'income' ? '其他收入' : '其他支出');
 
-            return { type, category: cat };
+            return { type, category: cat, source: 'rule' };
         }
 
         /** 用 Gemini AI 分類 */
@@ -892,11 +893,15 @@
                 const icon = r.type === 'income' ? '💵' : '💸';
                 const color = r.type === 'income' ? 'text-emerald-600' : 'text-rose-500';
                 const bgColor = r.type === 'income' ? 'bg-emerald-50' : 'bg-rose-50';
+                const sourceBadge = r.source === 'ai'
+                    ? '<span class="text-[9px] text-indigo-400 ml-1">🤖AI</span>'
+                    : '<span class="text-[9px] text-slate-300 ml-1">📖規則</span>';
                 html += `<div class="${bgColor} rounded-lg px-2 py-1.5 flex items-center justify-between">
                     <div class="flex items-center space-x-2 min-w-0">
                         <input type="checkbox" id="ai-chk-${i}" checked onchange="updateSelectedCount()" class="w-4 h-4 rounded accent-indigo-600 shrink-0">
                         <span class="text-xs">${icon}</span>
                         <span class="text-[10px] font-medium text-slate-500">${r.category}</span>
+                        ${sourceBadge}
                         <span class="text-[10px] text-slate-400 truncate">${r.note}</span>
                     </div>
                     <span class="text-xs font-bold ${color} shrink-0">${r.type === 'income' ? '+' : '-'}$${r.amount.toLocaleString()}</span>
