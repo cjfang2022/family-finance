@@ -91,7 +91,34 @@
 
         <!-- ==================== 記帳 ==================== -->
         <div id="content-transactions" class="tab-content space-y-3 animate-in">
-            <!-- 新增區 -->
+            <!-- 🤖 AI 智慧記帳 -->
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 shadow-sm border border-indigo-100">
+                <h2 class="font-bold text-sm text-indigo-600 mb-1">🤖 AI 智慧記帳</h2>
+                <p class="text-[10px] text-slate-400 mb-2">輸入文字或按🎤說話，例如「牛排$120」「搭高鐵1490」「薪資5萬」</p>
+                <div class="flex space-x-2">
+                    <div class="flex-1 relative">
+                        <input type="text" id="ai-input" placeholder="說或輸入文字..." onkeydown="if(event.key==='Enter')parseAIInput()" class="w-full px-3 py-2.5 rounded-lg border border-indigo-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300 pr-10">
+                        <button id="ai-mic-btn" onclick="startAIVoice()" class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-500 transition text-sm">🎤</button>
+                    </div>
+                    <button onclick="parseAIInput()" class="touch-btn px-4 py-2.5 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">🤖 記帳</button>
+                </div>
+                <!-- 預覽 -->
+                <div id="ai-preview" class="hidden mt-2 bg-white rounded-lg p-2.5 border border-indigo-100 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-1.5 min-w-0">
+                            <span id="ai-preview-type" class="text-[10px] font-bold px-1.5 py-0.5 rounded"></span>
+                            <span id="ai-preview-cat" class="text-xs font-medium text-slate-600"></span>
+                            <span id="ai-preview-amount" class="text-sm font-black"></span>
+                        </div>
+                        <div class="flex space-x-1.5 shrink-0">
+                            <button onclick="confirmAI()" class="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold active:bg-emerald-200 transition">✅ 確認</button>
+                            <button onclick="clearAI()" class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-[10px] active:bg-slate-200 transition">✕</button>
+                        </div>
+                    </div>
+                    <p id="ai-preview-note" class="text-[9px] text-slate-400 mt-1"></p>
+                </div>
+            </div>
+            <!-- 手動新增區 -->
             <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
                 <h2 class="font-bold text-sm text-slate-600 mb-3">✏️ 新增記帳</h2>
                 <div class="space-y-2.5">
@@ -658,6 +685,172 @@
             el.classList.remove('opacity-0', 'scale-90'); el.classList.add('opacity-100', 'scale-100');
             clearTimeout(el._timer);
             el._timer = setTimeout(() => { el.classList.add('opacity-0', 'scale-90'); el.classList.remove('opacity-100', 'scale-100'); }, 2200);
+        }
+
+        // ====== 🤖 AI 智慧記帳 ======
+        let _aiResult = null; // { type, category, amount, note }
+
+        function parseAIInput() {
+            const raw = document.getElementById('ai-input').value.trim();
+            if (!raw) { showToast('請輸入或說話'); return; }
+            _aiResult = aiParseNatural(raw);
+            renderAIPreview(_aiResult, raw);
+        }
+
+        function aiParseNatural(text) {
+            // 1) 抽數字：第一個數字，支援 1000、1,000、1.5k、5萬
+            let amount = 0;
+            let amountStr = '';
+            const numMatch = text.match(/(\d[\d,]*\.?\d*)\s*(k|千|萬|百)?/i);
+            if (numMatch) {
+                let n = parseFloat(numMatch[1].replace(/,/g, ''));
+                const unit = (numMatch[2] || '').toLowerCase();
+                if (unit === 'k' || unit === '千') n *= 1000;
+                else if (unit === '萬') n *= 10000;
+                else if (unit === '百') n *= 100;
+                amount = n;
+                amountStr = numMatch[0];
+            }
+
+            // 2) 判斷 type：包含收入關鍵字 → income
+            const incomeKeywords = ['薪資','薪水','工資','獎金','年終','分紅','投資','股息','利息','股利','租金','兼職','接案','收入','紅包','禮金'];
+            const isIncome = incomeKeywords.some(k => text.includes(k));
+            const type = isIncome ? 'income' : 'expense';
+
+            // 3) 分類匹配
+            let matchedCat = '';
+            // 先比對支出（使用者自訂分類 + 內建關鍵字）
+            const catMap = {
+                // 支出關鍵字 → 分類
+                '餐飲|外食|牛排|便當|麵|飯|火鍋|燒烤|早餐|午餐|晚餐|宵夜|飲料|咖啡|手搖|麥當勞|肯德基|subway|爭鮮|吃到飽|小吃|餐廳|美食|速食|日料|壽司|拉麵|滷味|鹹酥雞|雞排|珍奶|豆漿|饅頭|漢堡|pizza|披薩': '餐飲/外食',
+                '超市|全聯|家樂福|costco|好市多|頂好|菜市場|買菜|購物|日用品|雜貨|蝦皮|pchome|網購|團購|採買': '日常採買',
+                '交通|高鐵|台鐵|捷運|公車|ubike|youbike|計程車|uber|taxi|機車|汽車|加油|停車|過路費|etc|月票|車票': '交通',
+                '水電|電費|水費|瓦斯|天然氣|管理費|第四台|網路費|房租|房貸|租屋|住宿|旅館': '居住/水電',
+                '娛樂|電影|Netflix|Spotify|遊戲|steam|手遊|課金|演唱會|KTV|遊樂園|旅遊|住宿|飯店|露營|滑雪|潛水': '娛樂',
+                '醫療|掛號|診所|醫院|藥局|看醫生|牙醫|眼科|中醫|復健|健檢|檢查|疫苗': '醫療',
+                '教育|學費|補習|課程|線上課程|書|參考書|家教': '教育',
+                '通訊|手機|電信|月租費|通話費|上網': '通訊',
+                '保險|勞保|健保|壽險|醫療險|車險|保費': '保險',
+                '捐款|紅包|禮物|送禮|賀禮|奠儀|喜宴|紅白包|交際|應酬|聚餐|同事': '其他支出'
+            };
+            const incomeCatMap = {
+                '薪資|薪水|月薪|底薪': '薪資',
+                '獎金|年終|分紅|績效|三節': '獎金',
+                '投資|股息|股利|利息|股票|基金': '投資收益',
+                '兼職|接案|freelance|打工|時薪': '兼職收入',
+                '租金|房租收入|出租': '兼職收入',
+                '紅包|禮金|過年': '紅包/禮金'
+            };
+
+            const map = type === 'income' ? incomeCatMap : catMap;
+            for (const [pattern, cat] of Object.entries(map)) {
+                if (new RegExp(pattern).test(text)) {
+                    matchedCat = cat;
+                    break;
+                }
+            }
+
+            // Fallback: 用第一個自訂分類，或設為「其他」
+            if (!matchedCat) {
+                matchedCat = CATEGORIES[type][0] || (type === 'income' ? '其他收入' : '其他支出');
+            }
+
+            // 4) 備註：從原文移除金額和分類關鍵字，保留剩餘文字
+            let note = text;
+            if (amountStr) note = note.replace(amountStr, '').trim();
+            // 移除非中文殘餘
+            note = note.replace(/[＋\+$]/g, '').trim();
+            // 如果什麼都不剩就用分類名
+            if (!note) note = type === 'income' ? '收入' : '支出';
+
+            return { type, category: matchedCat, amount, note };
+        }
+
+        function renderAIPreview(r, raw) {
+            const el = document.getElementById('ai-preview');
+            el.classList.remove('hidden');
+
+            const typeLabel = r.type === 'income' ? '💵 收入' : '💸 支出';
+            const typeColor = r.type === 'income' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700';
+            const amtColor = r.type === 'income' ? 'text-emerald-600' : 'text-rose-500';
+
+            document.getElementById('ai-preview-type').textContent = typeLabel;
+            document.getElementById('ai-preview-type').className = `text-[10px] font-bold px-1.5 py-0.5 rounded ${typeColor}`;
+            document.getElementById('ai-preview-cat').textContent = r.category;
+            document.getElementById('ai-preview-amount').textContent = (r.type === 'income' ? '+' : '-') + '$' + r.amount.toLocaleString();
+            document.getElementById('ai-preview-amount').className = `text-sm font-black ${amtColor}`;
+            document.getElementById('ai-preview-note').textContent = '📝 ' + r.note;
+        }
+
+        function clearAI() {
+            document.getElementById('ai-preview').classList.add('hidden');
+            document.getElementById('ai-input').value = '';
+            _aiResult = null;
+        }
+
+        async function confirmAI() {
+            if (!_aiResult || !_aiResult.amount || _aiResult.amount <= 0) { showToast('⚠️ 請先輸入正確金額'); return; }
+            try {
+                await apiPost('/api/transactions', {
+                    date: today(),
+                    type: _aiResult.type,
+                    category: _aiResult.category,
+                    amount: _aiResult.amount,
+                    note: _aiResult.note
+                });
+                showToast('✅ AI 已自動記帳！');
+                clearAI();
+                await loadFromCloud();
+                renderTxTable();
+            } catch(e) { showToast('⚠️ 失敗，請手動輸入'); }
+        }
+
+        // ====== 🎤 語音輸入 ======
+        let _aiRecognition = null;
+        function startAIVoice() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) { showToast('⚠️ 此瀏覽器不支援語音'); return; }
+
+            if (_aiRecognition && _aiRecognition._running) {
+                _aiRecognition.stop();
+                return;
+            }
+
+            const rec = new SpeechRecognition();
+            rec.lang = 'zh-TW';
+            rec.continuous = false;
+            rec.interimResults = true;
+
+            const micBtn = document.getElementById('ai-mic-btn');
+            micBtn.textContent = '🔴';
+            micBtn.style.color = '#ef4444';
+            rec._running = true;
+            _aiRecognition = rec;
+
+            rec.onresult = (e) => {
+                const transcript = e.results[e.results.length - 1][0].transcript;
+                document.getElementById('ai-input').value = transcript;
+                // 如果是最終結果，自動解析
+                if (e.results[e.results.length - 1].isFinal) {
+                    rec.stop();
+                    parseAIInput();
+                }
+            };
+
+            rec.onend = () => {
+                micBtn.textContent = '🎤';
+                micBtn.style.color = '';
+                rec._running = false;
+            };
+
+            rec.onerror = () => {
+                micBtn.textContent = '🎤';
+                micBtn.style.color = '';
+                rec._running = false;
+                showToast('⚠️ 語音辨識失敗');
+            };
+
+            try { rec.start(); } catch(_) { showToast('⚠️ 語音啟動失敗'); }
         }
 
         // ====== 統整 ======
