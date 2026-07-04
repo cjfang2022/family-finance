@@ -18,224 +18,224 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .tab-btn { transition: all .2s; flex-shrink: 0; }
-        .tab-btn.active { background: #eef2ff; color: #4338ca; border-color: #a5b4fc; }
+        .tab-btn.active { background: rgba(6,182,212,.15); color: #06b6d4; border-color: #06b6d4; }
         .animate-in { animation: fadeIn .25s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        .chart-wrap { position: relative; width: 100%; height: 180px; }
-        .chart-wrap canvas { max-height: 180px !important; max-width: 100% !important; }
-        .touch-btn { min-height: 44px; }
+        .chart-wrap { position: relative; width: 100%; height: 200px; }
+        .chart-wrap canvas { max-height: 200px !important; max-width: 100% !important; }
+        .touch-btn { min-height: 48px; }
+        select, input, textarea { font-size: 16px !important; }
         @media print { .no-print { display: none !important; } body { background: #fff !important; } }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-700 min-h-screen">
+<body class="bg-slate-900 text-slate-200 min-h-screen antialiased">
 
     <!-- 頂欄 -->
-    <header class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg sticky top-0 z-40">
-        <div class="max-w-lg mx-auto px-3 py-2.5 flex justify-between items-center">
-            <div class="flex items-center space-x-2 min-w-0">
-                <span class="text-xl shrink-0">💰</span>
+    <header class="bg-gradient-to-r from-cyan-700 to-indigo-800 text-white shadow-lg sticky top-0 z-40 border-b border-cyan-500/20">
+        <div class="max-w-lg mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 min-w-0">
+                <span class="text-2xl shrink-0">💰</span>
                 <div class="min-w-0">
-                    <h1 class="font-bold text-sm md:text-base tracking-wider truncate">家庭收支小管家</h1>
-                    <p class="text-[10px] text-indigo-200 truncate">兩階記帳 × 預算 × 雲端</p>
+                    <h1 class="font-black text-lg tracking-wider truncate">家庭收支小管家</h1>
+                    <p class="text-xs text-cyan-300/80 truncate">兩階記帳 × 預算 × 雲端</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-1 text-[10px] shrink-0">
-                <button onclick="manualSync()" class="bg-white/20 hover:bg-white/30 active:scale-90 transition px-2 py-1 rounded-lg flex items-center space-x-0.5">
-                    <span id="sync-icon">⏳</span>
-                    <span id="sync-label" class="hidden sm:inline">連線中</span>
-                </button>
-            </div>
+            <button onclick="manualSync()" class="bg-white/10 hover:bg-white/20 active:scale-90 transition px-3 py-1.5 rounded-xl flex items-center space-x-1 text-xs shrink-0 border border-white/10">
+                <span id="sync-icon" class="text-sm">⏳</span>
+                <span id="sync-label" class="hidden sm:inline text-white/70">連線中</span>
+            </button>
         </div>
     </header>
 
     <!-- 固定底部頁籤導航 -->
-    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-2px_10px_rgba(0,0,0,.05)] no-print">
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-800 border-t border-slate-700/50 shadow-[0_-4px_20px_rgba(0,0,0,.3)] no-print">
         <div class="max-w-lg mx-auto flex">
-            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active flex-1 flex flex-col items-center py-1.5 text-[10px] border-t-2 border-transparent active:border-indigo-500"><span class="text-base">📊</span><span>首頁</span></button>
-            <button onclick="switchTab('transactions')" id="tab-transactions" class="tab-btn flex-1 flex flex-col items-center py-1.5 text-[10px] border-t-2 border-transparent"><span class="text-base">✏️</span><span>記帳</span></button>
-            <button onclick="switchTab('budget')" id="tab-budget" class="tab-btn flex-1 flex flex-col items-center py-1.5 text-[10px] border-t-2 border-transparent"><span class="text-base">🎯</span><span>預算</span></button>
-            <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn flex-1 flex flex-col items-center py-1.5 text-[10px] border-t-2 border-transparent"><span class="text-base">📄</span><span>報表</span></button>
-            <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn flex-1 flex flex-col items-center py-1.5 text-[10px] border-t-2 border-transparent"><span class="text-base">⚙️</span><span>設定</span></button>
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active flex-1 flex flex-col items-center py-2 text-xs border-t-2 border-transparent font-medium"><span class="text-xl mb-0.5">📊</span><span>首頁</span></button>
+            <button onclick="switchTab('transactions')" id="tab-transactions" class="tab-btn flex-1 flex flex-col items-center py-2 text-xs border-t-2 border-transparent font-medium"><span class="text-xl mb-0.5">✏️</span><span>記帳</span></button>
+            <button onclick="switchTab('budget')" id="tab-budget" class="tab-btn flex-1 flex flex-col items-center py-2 text-xs border-t-2 border-transparent font-medium"><span class="text-xl mb-0.5">🎯</span><span>預算</span></button>
+            <button onclick="switchTab('reports')" id="tab-reports" class="tab-btn flex-1 flex flex-col items-center py-2 text-xs border-t-2 border-transparent font-medium"><span class="text-xl mb-0.5">📄</span><span>報表</span></button>
+            <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn flex-1 flex flex-col items-center py-2 text-xs border-t-2 border-transparent font-medium"><span class="text-xl mb-0.5">⚙️</span><span>設定</span></button>
         </div>
     </nav>
 
     <!-- 主內容區塊 -->
-    <main class="max-w-lg mx-auto px-3 pt-3 pb-20 space-y-4">
+    <main class="max-w-lg mx-auto px-4 pt-4 pb-24 space-y-4">
 
         <!-- ==================== 儀表板 ==================== -->
-        <div id="content-dashboard" class="tab-content active space-y-3 animate-in">
-            <div class="grid grid-cols-2 gap-2">
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">本月收入</p><p id="d-income" class="text-base md:text-lg font-black text-emerald-600 mt-0.5">$0</p></div>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">本月支出</p><p id="d-expense" class="text-base md:text-lg font-black text-rose-500 mt-0.5">$0</p></div>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">本月結餘</p><p id="d-balance" class="text-base md:text-lg font-black text-indigo-600 mt-0.5">$0</p></div>
-                <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100"><p class="text-[10px] text-slate-400">筆數</p><p id="d-count" class="text-base md:text-lg font-black text-slate-600 mt-0.5">0</p></div>
+        <div id="content-dashboard" class="tab-content active space-y-4 animate-in">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm"><p class="text-sm text-slate-400">本月收入</p><p id="d-income" class="text-2xl font-black text-emerald-400 mt-1">$0</p></div>
+                <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm"><p class="text-sm text-slate-400">本月支出</p><p id="d-expense" class="text-2xl font-black text-rose-400 mt-1">$0</p></div>
+                <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm"><p class="text-sm text-slate-400">本月結餘</p><p id="d-balance" class="text-2xl font-black text-cyan-400 mt-1">$0</p></div>
+                <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm"><p class="text-sm text-slate-400">筆數</p><p id="d-count" class="text-2xl font-black text-slate-200 mt-1">0</p></div>
             </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-[11px] text-slate-500 mb-2">📈 近 6 月收支趨勢</h3>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-sm text-slate-300 mb-3">📈 近 6 月收支趨勢</h3>
                 <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
             </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-[11px] text-slate-500 mb-2">🥧 本月支出分類</h3>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-sm text-slate-300 mb-3">🥧 本月支出分類</h3>
                 <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
             </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-[11px] text-slate-500 mb-2">📋 近期明細</h3>
-                <div id="d-recent" class="text-xs text-slate-400 text-center py-4">載入中...</div>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-sm text-slate-300 mb-3">📋 近期明細</h3>
+                <div id="d-recent" class="text-sm text-slate-500 text-center py-4">載入中...</div>
             </div>
         </div>
 
         <!-- ==================== 記帳 ==================== -->
-        <div id="content-transactions" class="tab-content space-y-3 animate-in">
+        <div id="content-transactions" class="tab-content space-y-4 animate-in">
             <!-- 🤖 AI 智慧記帳 -->
-            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 shadow-sm border border-indigo-100">
-                <h2 class="font-bold text-sm text-indigo-600 mb-1">🤖 AI 智慧記帳</h2>
-                <p class="text-[10px] text-slate-400 mb-2">輸入文字、按🎤說話、或📷拍照，自動分類！<br>例如「牛排120 水果50 高鐵1490 薪水5萬」</p>
+            <div class="bg-gradient-to-br from-cyan-900/40 to-indigo-900/40 rounded-2xl p-4 border border-cyan-500/20 backdrop-blur-sm">
+                <h2 class="font-bold text-base text-cyan-400 mb-2">🤖 AI 智慧記帳</h2>
+                <p class="text-sm text-slate-400 mb-3 leading-relaxed">輸入文字、按🎤說話、或📷拍照，自動分類！<br>例如「牛排120 水果50 高鐵1490 薪水5萬」</p>
                 <div class="flex space-x-2">
                     <div class="flex-1 relative">
-                        <input type="text" id="ai-input" placeholder="說或輸入文字，支援多筆..." onkeydown="if(event.key==='Enter')parseAIInput()" class="w-full px-3 py-2.5 rounded-lg border border-indigo-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300 pr-10">
-                        <button id="ai-mic-btn" onclick="startAIVoice()" class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-500 transition text-sm">🎤</button>
+                        <input type="text" id="ai-input" placeholder="說或輸入文字，支援多筆..." onkeydown="if(event.key==='Enter')parseAIInput()" class="w-full px-4 py-3 rounded-xl border border-cyan-700/50 bg-slate-800/80 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 pr-12 placeholder-slate-500">
+                        <button id="ai-mic-btn" onclick="startAIVoice()" class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-cyan-400 transition text-lg">🎤</button>
                     </div>
-                    <button onclick="parseAIInput()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">🤖 記帳</button>
-                    <button onclick="document.getElementById('ai-cam-input').click()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-purple-600 hover:bg-purple-700 shadow-sm active:scale-[0.98] transition">📷</button>
-                    <button onclick="document.getElementById('ai-album-input').click()" class="touch-btn px-3 py-2.5 rounded-lg font-bold text-xs text-white bg-sky-600 hover:bg-sky-700 shadow-sm active:scale-[0.98] transition">🖼️</button>
+                    <button onclick="parseAIInput()" class="touch-btn px-4 rounded-xl font-bold text-sm text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition">🤖 記帳</button>
+                    <button onclick="document.getElementById('ai-cam-input').click()" class="touch-btn px-4 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 active:scale-[0.97] transition">📷</button>
+                    <button onclick="document.getElementById('ai-album-input').click()" class="touch-btn px-4 rounded-xl font-bold text-sm text-white bg-sky-600 hover:bg-sky-500 shadow-lg shadow-sky-500/20 active:scale-[0.97] transition">🖼️</button>
                 </div>
                 <input type="file" id="ai-cam-input" accept="image/*" capture="environment" class="hidden" onchange="ocrImage(this)">
                 <input type="file" id="ai-album-input" accept="image/*" class="hidden" onchange="ocrImage(this)">
-                <div id="ai-ocr-loading" class="hidden mt-2 bg-purple-50 rounded-lg p-2.5 text-[10px] text-purple-600 text-center">🔍 OCR 辨識中...</div>
-                <div id="ai-preview" class="hidden mt-2 space-y-1.5"></div>
+                <div id="ai-ocr-loading" class="hidden mt-3 bg-indigo-900/50 rounded-xl p-3 text-sm text-cyan-400 text-center border border-indigo-700/30">🔍 OCR 辨識中...</div>
+                <div id="ai-preview" class="hidden mt-3 space-y-2"></div>
             </div>
             <!-- 手動新增區 -->
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h2 class="font-bold text-sm text-slate-600 mb-3">✏️ 新增記帳</h2>
-                <div class="space-y-2.5">
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h2 class="font-bold text-base text-slate-200 mb-4">✏️ 新增記帳</h2>
+                <div class="space-y-3.5">
                     <div>
-                        <label class="text-[10px] text-slate-400 font-medium">類別</label>
-                        <div class="flex space-x-2 mt-1">
-                            <button id="t-type-income" onclick="setTxType('income')" class="touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">💵 收入</button>
-                            <button id="t-type-expense" onclick="setTxType('expense')" class="touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">💸 支出</button>
+                        <label class="text-sm text-slate-400 font-medium">類別</label>
+                        <div class="flex space-x-3 mt-1.5">
+                            <button id="t-type-income" onclick="setTxType('income')" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-emerald-900/40 text-emerald-400 border border-emerald-700/50 active:scale-[0.97] transition">💵 收入</button>
+                            <button id="t-type-expense" onclick="setTxType('expense')" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-slate-700/40 text-slate-400 border border-slate-600/50 active:scale-[0.97] transition">💸 支出</button>
                         </div>
                     </div>
-                    <div><label class="text-[10px] text-slate-400">日期</label><input type="date" id="tx-date" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300"></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div><label class="text-[10px] text-slate-400">大類</label><select id="tx-main-cat" onchange="renderTxSubCats()" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
-                        <div><label class="text-[10px] text-slate-400">細項</label><select id="tx-sub-cat" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+                    <div><label class="text-sm text-slate-400">日期</label><input type="date" id="tx-date" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-sm text-slate-400">大類</label><select id="tx-main-cat" onchange="renderTxSubCats()" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></select></div>
+                        <div><label class="text-sm text-slate-400">細項</label><select id="tx-sub-cat" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></select></div>
                     </div>
-                    <div><label class="text-[10px] text-slate-400">金額</label><input type="number" id="tx-amount" placeholder="0" inputmode="decimal" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-base font-bold text-right outline-none focus:ring-2 focus:ring-indigo-300"></div>
-                    <div><label class="text-[10px] text-slate-400">備註</label><input type="text" id="tx-note" placeholder="選填" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-indigo-300"></div>
-                    <button onclick="addTransaction()" class="touch-btn w-full py-3 rounded-lg font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">✅ 確認新增</button>
+                    <div><label class="text-sm text-slate-400">金額</label><input type="number" id="tx-amount" placeholder="0" inputmode="decimal" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-lg font-bold text-right text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></div>
+                    <div><label class="text-sm text-slate-400">備註</label><input type="text" id="tx-note" placeholder="選填" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 placeholder-slate-500"></div>
+                    <button onclick="addTransaction()" class="touch-btn w-full py-3.5 rounded-xl font-bold text-base text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition">✅ 確認新增</button>
                 </div>
             </div>
             <!-- 明細 -->
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 class="font-bold text-xs text-slate-600">📋 明細</h2>
-                    <div class="flex space-x-1.5">
-                        <select id="tx-month" class="text-[10px] px-2 py-1.5 rounded-lg border border-slate-200 bg-white outline-none" onchange="renderTxTable()"></select>
-                        <button onclick="loadFromCloud()" class="text-[10px] px-2 py-1.5 bg-sky-100 text-sky-600 rounded-lg font-medium active:bg-sky-200 transition">🔄</button>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="font-bold text-base text-slate-200">📋 明細</h2>
+                    <div class="flex space-x-2">
+                        <select id="tx-month" class="text-sm px-3 py-2 rounded-xl border border-slate-700/50 bg-slate-900/60 text-slate-200 outline-none" onchange="renderTxTable()"></select>
+                        <button onclick="loadFromCloud()" class="text-sm px-3 py-2 bg-sky-900/40 text-sky-400 rounded-xl font-medium border border-sky-700/30 active:bg-sky-800/50 transition">🔄</button>
                     </div>
                 </div>
-                <div id="tx-table" class="text-[11px] text-slate-400 text-center py-6">載入中...</div>
+                <div id="tx-table" class="text-sm text-slate-500 text-center py-6">載入中...</div>
             </div>
         </div>
 
         <!-- ==================== 預算 ==================== -->
-        <div id="content-budget" class="tab-content space-y-3 animate-in">
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 class="font-bold text-sm text-slate-600">🎯 預算</h2>
-                    <input type="month" id="bg-month" class="text-[10px] px-2 py-1.5 rounded-lg border border-slate-200 outline-none" onchange="loadBudgets()">
+        <div id="content-budget" class="tab-content space-y-4 animate-in">
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg text-slate-200">🎯 預算</h2>
+                    <input type="month" id="bg-month" class="text-sm px-3 py-2 rounded-xl border border-slate-700/50 bg-slate-900/60 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50" onchange="loadBudgets()">
                 </div>
-                <div class="grid grid-cols-3 gap-2 mb-3">
-                    <div class="bg-indigo-50 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-400">預算總額</p><p id="bg-total" class="text-sm font-black text-indigo-600">$0</p></div>
-                    <div class="bg-amber-50 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-400">已花費</p><p id="bg-spent" class="text-sm font-black text-amber-600">$0</p></div>
-                    <div class="bg-emerald-50 rounded-lg p-2 text-center"><p class="text-[9px] text-slate-400">剩餘</p><p id="bg-remain" class="text-sm font-black text-emerald-600">$0</p></div>
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="bg-cyan-900/30 rounded-xl p-3 text-center border border-cyan-700/20"><p class="text-xs text-slate-400">預算總額</p><p id="bg-total" class="text-lg font-black text-cyan-400 mt-1">$0</p></div>
+                    <div class="bg-amber-900/30 rounded-xl p-3 text-center border border-amber-700/20"><p class="text-xs text-slate-400">已花費</p><p id="bg-spent" class="text-lg font-black text-amber-400 mt-1">$0</p></div>
+                    <div class="bg-emerald-900/30 rounded-xl p-3 text-center border border-emerald-700/20"><p class="text-xs text-slate-400">剩餘</p><p id="bg-remain" class="text-lg font-black text-emerald-400 mt-1">$0</p></div>
                 </div>
-                <!-- 各大類預算彙總 -->
-                <div id="bg-summary" class="space-y-2 mb-3"></div>
-                <!-- 細項預算 -->
+                <div id="bg-summary" class="space-y-2 mb-4"></div>
                 <div id="bg-list" class="space-y-2"></div>
-                <button onclick="editAllBudgets()" class="touch-btn w-full mt-3 py-2.5 rounded-lg font-bold text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 active:bg-indigo-200 transition">✏️ 編輯預算</button>
+                <button onclick="editAllBudgets()" class="touch-btn w-full mt-4 py-3 rounded-xl font-bold text-sm text-cyan-400 bg-cyan-900/30 hover:bg-cyan-800/40 active:bg-cyan-700/40 transition border border-cyan-700/20">✏️ 編輯預算</button>
             </div>
         </div>
 
         <!-- ==================== 報表 ==================== -->
-        <div id="content-reports" class="tab-content space-y-3 animate-in">
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-bold text-[11px] text-slate-500">📊 收支統計</h3>
-                    <select id="r-month" class="text-[10px] px-2 py-1.5 rounded-lg border border-slate-200 outline-none" onchange="renderReport()"></select>
+        <div id="content-reports" class="tab-content space-y-4 animate-in">
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-sm text-slate-300">📊 收支統計</h3>
+                    <select id="r-month" class="text-sm px-3 py-2 rounded-xl border border-slate-700/50 bg-slate-900/60 text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50" onchange="renderReport()"></select>
                 </div>
                 <div class="chart-wrap"><canvas id="reportChart"></canvas></div>
             </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-[11px] text-slate-500 mb-2">📋 分類彙總（大類）</h3>
-                <div id="r-summary" class="text-xs text-slate-400 text-center py-4">載入中...</div>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-sm text-slate-300 mb-3">📋 分類彙總（大類）</h3>
+                <div id="r-summary" class="text-sm text-slate-500 text-center py-4">載入中...</div>
             </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="font-bold text-[11px] text-slate-500">📄 匯出</h3>
-                    <div class="flex space-x-1.5">
-                        <button onclick="exportCSV()" class="touch-btn text-[10px] px-3 py-1.5 bg-indigo-100 text-indigo-600 rounded-lg font-medium active:bg-indigo-200 transition">📥 CSV</button>
-                        <button onclick="exportPDF()" class="touch-btn text-[10px] px-3 py-1.5 bg-rose-100 text-rose-600 rounded-lg font-medium active:bg-rose-200 transition">📄 PDF</button>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-sm text-slate-300">📄 匯出</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="exportCSV()" class="touch-btn text-sm px-4 py-2 bg-cyan-900/40 text-cyan-400 rounded-xl font-medium border border-cyan-700/30 active:bg-cyan-800/50 transition">📥 CSV</button>
+                        <button onclick="exportPDF()" class="touch-btn text-sm px-4 py-2 bg-rose-900/40 text-rose-400 rounded-xl font-medium border border-rose-700/30 active:bg-rose-800/50 transition">📄 PDF</button>
                     </div>
                 </div>
-                <div id="r-detail" class="text-xs text-slate-400 text-center py-4">選取月份查看明細</div>
+                <div id="r-detail" class="text-sm text-slate-500 text-center py-4">選取月份查看明細</div>
             </div>
         </div>
 
         <!-- ==================== 設定 ==================== -->
-        <div id="content-settings" class="tab-content space-y-3 animate-in">
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-sm text-slate-600 mb-3">⚙️ 自訂分類（兩階）</h3>
-                <div class="space-y-3">
+        <div id="content-settings" class="tab-content space-y-4 animate-in">
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-lg text-slate-200 mb-4">⚙️ 自訂分類</h3>
+                <div class="space-y-4">
                     <div>
-                        <h4 class="text-sm font-bold text-emerald-600 mb-2">💵 收入大類</h4>
-                        <div id="s-income-main" class="space-y-2 mb-2"></div>
-                        <div class="flex space-x-1.5">
-                            <input id="s-new-income-main" placeholder="新增大類名稱" class="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-sm outline-none">
-                            <button onclick="addMainCat('income')" class="touch-btn px-3 py-2.5 bg-emerald-100 text-emerald-600 rounded-lg text-sm font-bold active:bg-emerald-200 transition">＋大類</button>
+                        <h4 class="text-base font-bold text-emerald-400 mb-3">💵 收入大類</h4>
+                        <div id="s-income-main" class="space-y-3 mb-3"></div>
+                        <div class="flex space-x-2">
+                            <input id="s-new-income-main" placeholder="新增大類名稱" class="flex-1 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 placeholder-slate-500">
+                            <button onclick="addMainCat('income')" class="touch-btn px-4 py-3 bg-emerald-900/40 text-emerald-400 rounded-xl text-sm font-bold border border-emerald-700/30 active:bg-emerald-800/50 transition">＋大類</button>
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-sm font-bold text-rose-600 mb-2">💸 支出大類</h4>
-                        <div id="s-expense-main" class="space-y-2 mb-2"></div>
-                        <div class="flex space-x-1.5">
-                            <input id="s-new-expense-main" placeholder="新增大類名稱" class="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-sm outline-none">
-                            <button onclick="addMainCat('expense')" class="touch-btn px-3 py-2.5 bg-rose-100 text-rose-600 rounded-lg text-sm font-bold active:bg-rose-200 transition">＋大類</button>
+                        <h4 class="text-base font-bold text-rose-400 mb-3">💸 支出大類</h4>
+                        <div id="s-expense-main" class="space-y-3 mb-3"></div>
+                        <div class="flex space-x-2">
+                            <input id="s-new-expense-main" placeholder="新增大類名稱" class="flex-1 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 placeholder-slate-500">
+                            <button onclick="addMainCat('expense')" class="touch-btn px-4 py-3 bg-rose-900/40 text-rose-400 rounded-xl text-sm font-bold border border-rose-700/30 active:bg-rose-800/50 transition">＋大類</button>
                         </div>
                     </div>
-                    <button onclick="resetCategories()" class="touch-btn w-full py-2.5 rounded-lg font-bold text-sm text-amber-600 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 transition border border-amber-200">🔄 還原預設分類</button>
+                    <button onclick="resetCategories()" class="touch-btn w-full py-3 rounded-xl font-bold text-sm text-amber-400 bg-amber-900/30 hover:bg-amber-800/40 active:bg-amber-700/40 transition border border-amber-700/20">🔄 還原預設分類</button>
                 </div>
             </div>
             <!-- 🤖 AI 設定 -->
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-sm text-slate-600 mb-3">🤖 AI 自動分類</h3>
-                <div class="space-y-2">
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-lg text-slate-200 mb-4">🤖 AI 自動分類</h3>
+                <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <label class="text-[10px] text-slate-400">狀態</label>
-                        <span id="ai-status" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-500">未啟用</span>
+                        <label class="text-sm text-slate-400">狀態</label>
+                        <span id="ai-status" class="text-sm font-bold px-3 py-1.5 rounded-xl bg-slate-700/50 text-slate-400">未啟用</span>
                     </div>
-                    <div id="ai-status-detail" class="hidden text-[10px] text-rose-600 bg-rose-50 rounded-lg px-2.5 py-2 leading-relaxed break-words"></div>
+                    <div id="ai-status-detail" class="hidden text-sm text-rose-400 bg-rose-900/30 rounded-xl px-4 py-3 leading-relaxed break-words border border-rose-700/20"></div>
                     <div>
-                        <label class="text-[10px] text-slate-400">Gemini API Key</label>
-                        <div class="flex space-x-1.5 mt-1">
-                            <input type="password" id="s-gemini-key" placeholder="輸入 Gemini API Key..." class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none">
-                            <button onclick="testGeminiKey()" class="touch-btn px-2.5 py-2 bg-amber-100 text-amber-600 rounded-lg text-[10px] font-bold active:bg-amber-200 transition">🔌 測試</button>
-                            <button onclick="saveGeminiKey()" class="touch-btn px-3 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold active:bg-indigo-200 transition">💾 儲存</button>
-                            <button onclick="clearGeminiKey()" class="touch-btn px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold active:bg-rose-200 transition">✕</button>
+                        <label class="text-sm text-slate-400">Gemini API Key</label>
+                        <div class="flex space-x-2 mt-1.5">
+                            <input type="password" id="s-gemini-key" placeholder="輸入 Gemini API Key..." class="flex-1 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 placeholder-slate-500">
+                            <button onclick="testGeminiKey()" class="touch-btn px-3 py-3 bg-amber-900/40 text-amber-400 rounded-xl text-sm font-bold border border-amber-700/30 active:bg-amber-800/50 transition">🔌 測試</button>
+                            <button onclick="saveGeminiKey()" class="touch-btn px-4 py-3 bg-cyan-900/40 text-cyan-400 rounded-xl text-sm font-bold border border-cyan-700/30 active:bg-cyan-800/50 transition">💾</button>
+                            <button onclick="clearGeminiKey()" class="touch-btn px-4 py-3 bg-rose-900/40 text-rose-400 rounded-xl text-sm font-bold border border-rose-700/30 active:bg-rose-800/50 transition">✕</button>
                         </div>
                     </div>
-                    <p class="text-[9px] text-slate-400 leading-relaxed">
-                        🔑 免費申請：<a href="https://aistudio.google.com/apikey" target="_blank" class="text-indigo-500 underline">Google AI Studio</a>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        🔑 免費申請：<a href="https://aistudio.google.com/apikey" target="_blank" class="text-cyan-400 underline">Google AI Studio</a>
                     </p>
                 </div>
             </div>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-100">
-                <h3 class="font-bold text-sm text-slate-600 mb-3">💾 資料管理</h3>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="exportJSON()" class="touch-btn px-3 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold active:bg-indigo-200 transition">📥 匯出備份</button>
-                    <button onclick="document.getElementById('import-json').click()" class="touch-btn px-3 py-2 bg-amber-100 text-amber-600 rounded-lg text-xs font-bold active:bg-amber-200 transition">📤 匯入備份</button>
-                    <button onclick="resetAll()" class="touch-btn px-3 py-2 bg-rose-100 text-rose-600 rounded-lg text-xs font-bold active:bg-rose-200 transition">🗑️ 清空</button>
+            <div class="bg-slate-800/80 rounded-2xl p-4 border border-slate-700/50 backdrop-blur-sm">
+                <h3 class="font-bold text-lg text-slate-200 mb-4">💾 資料管理</h3>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="exportJSON()" class="touch-btn px-5 py-3 bg-cyan-900/40 text-cyan-400 rounded-xl text-sm font-bold border border-cyan-700/30 active:bg-cyan-800/50 transition">📥 匯出備份</button>
+                    <button onclick="document.getElementById('import-json').click()" class="touch-btn px-5 py-3 bg-amber-900/40 text-amber-400 rounded-xl text-sm font-bold border border-amber-700/30 active:bg-amber-800/50 transition">📤 匯入備份</button>
+                    <button onclick="resetAll()" class="touch-btn px-5 py-3 bg-rose-900/40 text-rose-400 rounded-xl text-sm font-bold border border-rose-700/30 active:bg-rose-800/50 transition">🗑️ 清空</button>
                 </div>
                 <input type="file" id="import-json" accept=".json" class="hidden" onchange="importJSON(event)">
             </div>
@@ -243,60 +243,60 @@
     </main>
 
     <!-- Modal: 編輯預算 -->
-    <div id="modal-budget" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-4 pb-8 sm:pb-4 max-h-[85vh] overflow-y-auto animate-in">
-            <div class="flex justify-center mb-3 sm:hidden"><div class="w-10 h-1 bg-slate-300 rounded-full"></div></div>
-            <h3 class="font-bold text-sm text-slate-700 mb-3">✏️ 編輯本月預算</h3>
-            <div id="modal-budget-tabs" class="flex space-x-1 mb-3 overflow-x-auto no-scrollbar"></div>
-            <div id="modal-budget-form" class="space-y-2"></div>
-            <div class="flex space-x-2 mt-4">
-                <button onclick="closeModal('modal-budget')" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">取消</button>
-                <button onclick="saveAllBudgets()" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition">💾 儲存</button>
+    <div id="modal-budget" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center hidden">
+        <div class="bg-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md sm:mx-4 p-5 pb-10 sm:pb-5 max-h-[85vh] overflow-y-auto animate-in border border-slate-700/50">
+            <div class="flex justify-center mb-4 sm:hidden"><div class="w-12 h-1.5 bg-slate-600 rounded-full"></div></div>
+            <h3 class="font-bold text-lg text-slate-200 mb-4">✏️ 編輯預算</h3>
+            <div id="modal-budget-tabs" class="flex space-x-1.5 mb-4 overflow-x-auto no-scrollbar"></div>
+            <div id="modal-budget-form" class="space-y-2.5"></div>
+            <div class="flex space-x-3 mt-5">
+                <button onclick="closeModal('modal-budget')" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition">取消</button>
+                <button onclick="saveAllBudgets()" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition">💾 儲存</button>
             </div>
         </div>
     </div>
 
     <!-- Modal: 編輯交易 -->
-    <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-4 pb-8 sm:pb-4 animate-in">
-            <div class="flex justify-center mb-3 sm:hidden"><div class="w-10 h-1 bg-slate-300 rounded-full"></div></div>
-            <h3 class="font-bold text-sm text-slate-700 mb-3">✏️ 編輯紀錄</h3>
-            <div class="space-y-2.5">
-                <div><label class="text-[10px] text-slate-400">日期</label><input type="date" id="e-date" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none"></div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div><label class="text-[10px] text-slate-400">大類</label><select id="e-main-cat" onchange="renderEditSubCats()" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
-                    <div><label class="text-[10px] text-slate-400">細項</label><select id="e-sub-cat" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none bg-white"></select></div>
+    <div id="modal-edit" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center hidden">
+        <div class="bg-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md sm:mx-4 p-5 pb-10 sm:pb-5 animate-in border border-slate-700/50">
+            <div class="flex justify-center mb-4 sm:hidden"><div class="w-12 h-1.5 bg-slate-600 rounded-full"></div></div>
+            <h3 class="font-bold text-lg text-slate-200 mb-4">✏️ 編輯紀錄</h3>
+            <div class="space-y-3.5">
+                <div><label class="text-sm text-slate-400">日期</label><input type="date" id="e-date" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-sm text-slate-400">大類</label><select id="e-main-cat" onchange="renderEditSubCats()" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></select></div>
+                    <div><label class="text-sm text-slate-400">細項</label><select id="e-sub-cat" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></select></div>
                 </div>
-                <div><label class="text-[10px] text-slate-400">金額</label><input type="number" id="e-amount" inputmode="decimal" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-base font-bold text-right outline-none"></div>
-                <div><label class="text-[10px] text-slate-400">備註</label><input type="text" id="e-note" class="w-full mt-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs outline-none"></div>
+                <div><label class="text-sm text-slate-400">金額</label><input type="number" id="e-amount" inputmode="decimal" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-lg font-bold text-right text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></div>
+                <div><label class="text-sm text-slate-400">備註</label><input type="text" id="e-note" class="w-full mt-1.5 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></div>
             </div>
-            <div class="flex space-x-2 mt-4">
-                <button onclick="deleteTx()" class="touch-btn px-4 py-2.5 rounded-lg text-xs font-bold bg-rose-100 text-rose-600 hover:bg-rose-200 transition">🗑️</button>
-                <button onclick="closeModal('modal-edit')" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-slate-100 hover:bg-slate-200 transition">取消</button>
-                <button onclick="saveEditTx()" class="touch-btn flex-1 py-2.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition">💾 儲存</button>
+            <div class="flex space-x-3 mt-5">
+                <button onclick="deleteTx()" class="touch-btn px-5 py-3 rounded-xl text-sm font-bold bg-rose-900/40 text-rose-400 border border-rose-700/30 hover:bg-rose-800/50 transition">🗑️</button>
+                <button onclick="closeModal('modal-edit')" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition">取消</button>
+                <button onclick="saveEditTx()" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-500/20 transition">💾 儲存</button>
             </div>
         </div>
     </div>
 
     <!-- Modal: 編輯大類細項 -->
-    <div id="modal-subcats" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
-        <div class="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-sm sm:mx-4 p-5 pb-8 sm:pb-5 animate-in">
-            <div class="flex justify-center mb-3 sm:hidden"><div class="w-10 h-1 bg-slate-300 rounded-full"></div></div>
-            <h3 class="font-bold text-base text-slate-700 mb-3" id="modal-subcats-title">編輯細項</h3>
-            <p class="text-xs text-slate-400 mb-2">點選細項名稱可直接編輯，點 ✕ 刪除</p>
-            <div id="modal-subcats-list" class="space-y-2 mb-3 max-h-56 overflow-y-auto"></div>
-            <div class="flex space-x-1.5">
-                <input id="modal-subcats-input" placeholder="新增細項名稱" class="flex-1 px-3 py-2.5 rounded-lg border border-slate-200 text-sm outline-none">
-                <button onclick="addSubCatFromModal()" class="touch-btn px-3 py-2.5 bg-indigo-100 text-indigo-600 rounded-lg text-sm font-bold active:bg-indigo-200 transition">＋</button>
+    <div id="modal-subcats" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-end sm:items-center justify-center hidden">
+        <div class="bg-slate-800 rounded-t-3xl sm:rounded-3xl w-full max-w-md sm:mx-4 p-5 pb-10 sm:pb-5 animate-in border border-slate-700/50">
+            <div class="flex justify-center mb-4 sm:hidden"><div class="w-12 h-1.5 bg-slate-600 rounded-full"></div></div>
+            <h3 class="font-bold text-lg text-slate-200 mb-2" id="modal-subcats-title">編輯細項</h3>
+            <p class="text-sm text-slate-400 mb-3">點選名稱可直接修改，點 ✕ 刪除</p>
+            <div id="modal-subcats-list" class="space-y-2 mb-4 max-h-60 overflow-y-auto"></div>
+            <div class="flex space-x-2">
+                <input id="modal-subcats-input" placeholder="新增細項名稱" class="flex-1 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50 placeholder-slate-500">
+                <button onclick="addSubCatFromModal()" class="touch-btn px-4 py-3 bg-cyan-900/40 text-cyan-400 rounded-xl text-sm font-bold border border-cyan-700/30 active:bg-cyan-800/50 transition">＋</button>
             </div>
-            <div class="flex space-x-2 mt-4">
-                <button onclick="closeModal('modal-subcats')" class="touch-btn flex-1 py-2.5 rounded-lg text-sm font-bold bg-slate-100 hover:bg-slate-200 transition">關閉</button>
+            <div class="flex space-x-3 mt-5">
+                <button onclick="closeModal('modal-subcats')" class="touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-slate-700/50 hover:bg-slate-700 text-slate-300 transition">關閉</button>
             </div>
         </div>
     </div>
 
     <!-- Toast -->
-    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl shadow-lg text-xs font-medium transition-all duration-400 opacity-0 scale-90 pointer-events-none bg-slate-800/90 text-white backdrop-blur-sm whitespace-nowrap"><span id="toast-msg"></span></div>
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium transition-all duration-400 opacity-0 scale-90 pointer-events-none bg-slate-800/95 text-slate-200 backdrop-blur-md whitespace-nowrap border border-slate-700/50"><span id="toast-msg"></span></div>
 
     <script>
         // ====== 設定 ======
@@ -340,7 +340,7 @@
         let transactions = [], budgets = {}, txType = 'expense', editingId = null;
         let _lastSyncVersion = null, _syncTimer = null, _isSyncing = false;
         let trendChart = null, catChart = null, reportChart = null;
-        let _budgetEditType = 'expense'; // 預算編輯目前查看的大類
+        let _budgetEditType = 'expense';
 
         // ====== 分類輔助函數 ======
         function getMainCats(type) { return Object.keys(CATEGORIES[type] || {}); }
@@ -355,12 +355,6 @@
         function displayCat(catStr) {
             const { main, sub } = splitCat(catStr);
             return sub ? main + ' > ' + sub : main;
-        }
-        function findMainCat(type, subCat) {
-            for (const [main, subs] of Object.entries(CATEGORIES[type] || {})) {
-                if (subs.includes(subCat)) return main;
-            }
-            return getMainCats(type)[0] || '';
         }
 
         // ====== 初始化 ======
@@ -397,7 +391,6 @@
         }
         function startAutoSync() { if (_syncTimer) clearInterval(_syncTimer); _syncTimer = setInterval(checkSync, 30000); }
         function showSyncBadge(icon) { document.getElementById('sync-icon').textContent = icon; }
-        function stopAutoSync() { if (_syncTimer) { clearInterval(_syncTimer); _syncTimer = null; } }
 
         function today() { const d = new Date(); return d.toISOString().split('T')[0]; }
         function currentMonth() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'); }
@@ -426,7 +419,6 @@
                 const s = await apiGet('/api/settings');
                 if (s.data && s.data.categories) {
                     const c = s.data.categories;
-                    // 檢查是否為兩階格式：income 是物件（有大類名稱當 key）而不是陣列
                     if (c && typeof c === 'object' && !Array.isArray(c.income) && !Array.isArray(c.expense) && c.income && c.expense) {
                         CATEGORIES = c;
                     }
@@ -476,17 +468,16 @@
         function setTxType(t) {
             txType = t;
             document.getElementById('t-type-income').className = t === 'income'
-                ? 'touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200'
-                : 'touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200';
+                ? 'touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-emerald-900/40 text-emerald-400 border border-emerald-700/50 active:scale-[0.97] transition'
+                : 'touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-slate-700/40 text-slate-400 border border-slate-600/50 active:scale-[0.97] transition';
             document.getElementById('t-type-expense').className = t === 'expense'
-                ? 'touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200'
-                : 'touch-btn flex-1 py-2 rounded-lg text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200';
+                ? 'touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-emerald-900/40 text-emerald-400 border border-emerald-700/50 active:scale-[0.97] transition'
+                : 'touch-btn flex-1 py-3 rounded-xl text-sm font-bold bg-slate-700/40 text-slate-400 border border-slate-600/50 active:scale-[0.97] transition';
             renderTxCats();
         }
         function renderTxCats() {
             const mains = getMainCats(txType);
-            const sel = document.getElementById('tx-main-cat');
-            sel.innerHTML = mains.map(m => '<option value="'+escAttr(m)+'">'+esc(m)+'</option>').join('');
+            document.getElementById('tx-main-cat').innerHTML = mains.map(m => '<option value="'+escAttr(m)+'">'+esc(m)+'</option>').join('');
             renderTxSubCats();
         }
         function renderTxSubCats() {
@@ -519,17 +510,17 @@
             const mf = document.getElementById('tx-month').value;
             const f = transactions.filter(t => t.date && t.date.startsWith(mf));
             const el = document.getElementById('tx-table');
-            if (!f.length) { el.innerHTML = '<div class="py-6">📭 本月尚無紀錄</div>'; return; }
-            let html = '<div class="space-y-0.5 max-h-80 overflow-y-auto no-scrollbar">';
+            if (!f.length) { el.innerHTML = '<div class="py-6 text-slate-500">📭 本月尚無紀錄</div>'; return; }
+            let html = '<div class="space-y-1 max-h-80 overflow-y-auto no-scrollbar">';
             f.sort((a,b) => (b.date + b.id).localeCompare(a.date + a.id)).forEach(t => {
-                const s = t.amount >= 0 ? 'text-emerald-600' : 'text-rose-500';
-                html += '<div onclick="openEditTx(\''+escAttr(t.id)+'\')" class="flex items-center justify-between px-2 py-2 active:bg-slate-50 rounded-lg border-b border-slate-50 last:border-0 cursor-pointer">'
-                    + '<div class="flex items-center space-x-2 min-w-0">'
-                    + '<span>'+(t.amount >= 0 ? '📈' : '📉')+'</span>'
+                const s = t.amount >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                html += '<div onclick="openEditTx(\''+escAttr(t.id)+'\')" class="flex items-center justify-between px-3 py-3 active:bg-slate-700/30 rounded-xl border-b border-slate-700/30 last:border-0 cursor-pointer transition">'
+                    + '<div class="flex items-center space-x-3 min-w-0">'
+                    + '<span class="text-lg">'+(t.amount >= 0 ? '📈' : '📉')+'</span>'
                     + '<div class="min-w-0">'
-                    + '<p class="text-xs font-medium text-slate-700 truncate">'+displayCat(t.category)+(t.note ? ' · '+esc(t.note) : '')+'</p>'
-                    + '<p class="text-[9px] text-slate-400">'+t.date+'</p></div></div>'
-                    + '<span class="text-xs font-bold '+s+' shrink-0">'+(t.amount > 0 ? '+' : '')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
+                    + '<p class="text-sm font-medium text-slate-200 truncate">'+displayCat(t.category)+(t.note ? ' <span class="text-slate-400">· '+esc(t.note)+'</span>' : '')+'</p>'
+                    + '<p class="text-xs text-slate-500">'+t.date+'</p></div></div>'
+                    + '<span class="text-sm font-bold '+s+' shrink-0">'+(t.amount > 0 ? '+' : '')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
             });
             html += '</div>';
             el.innerHTML = html;
@@ -544,7 +535,6 @@
             document.getElementById('e-note').value = t.note || '';
             const { main, sub } = splitCat(t.category);
             const type = t.amount >= 0 ? 'income' : 'expense';
-            // fill main cat select
             const mains = getMainCats(type);
             const mainSel = document.getElementById('e-main-cat');
             mainSel.innerHTML = mains.map(m => '<option value="'+escAttr(m)+'"'+(m===main?' selected':'')+'>'+esc(m)+'</option>').join('');
@@ -591,7 +581,6 @@
             document.getElementById('bg-spent').textContent = '$' + totalSpent.toLocaleString();
             document.getElementById('bg-remain').textContent = '$' + (totalBud - totalSpent).toLocaleString();
 
-            // 大類彙總
             const mainSummary = {};
             for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
                 let budgetSum = 0, spentSum = 0;
@@ -600,26 +589,23 @@
                     budgetSum += budgets[key] || 0;
                     spentSum += spent[key] || 0;
                 });
-                if (budgetSum > 0 || spentSum > 0) {
-                    mainSummary[main] = { budget: budgetSum, spent: spentSum };
-                }
+                if (budgetSum > 0 || spentSum > 0) mainSummary[main] = { budget: budgetSum, spent: spentSum };
             }
             const sumEl = document.getElementById('bg-summary');
             const sumKeys = Object.keys(mainSummary);
             if (sumKeys.length) {
-                sumEl.innerHTML = '<div class="text-[10px] font-bold text-slate-500 mb-1">📊 大類彙總</div>'
+                sumEl.innerHTML = '<div class="text-xs font-bold text-slate-400 mb-2">📊 大類彙總</div>'
                     + sumKeys.map(main => {
                         const { budget, spent } = mainSummary[main];
                         const pct = Math.min(100, Math.round((spent/budget)*100));
-                        return '<div class="bg-slate-50 rounded-lg p-2">'
-                            + '<div class="flex justify-between text-[10px] mb-0.5"><span class="font-medium">'+esc(main)+'</span><span class="text-slate-400">$'+spent.toLocaleString()+' / $'+budget.toLocaleString()+'</span></div>'
-                            + '<div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div class="h-full '+(pct>=100?'bg-rose-500':pct>=80?'bg-amber-500':'bg-emerald-500')+' rounded-full" style="width:'+pct+'%"></div></div></div>';
+                        return '<div class="bg-slate-700/30 rounded-xl p-3 border border-slate-700/30">'
+                            + '<div class="flex justify-between text-sm mb-1"><span class="font-medium text-slate-300">'+esc(main)+'</span><span class="text-slate-400">$'+spent.toLocaleString()+' / $'+budget.toLocaleString()+'</span></div>'
+                            + '<div class="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden"><div class="h-full '+(pct>=100?'bg-rose-500':pct>=80?'bg-amber-500':'bg-emerald-500')+' rounded-full transition-all" style="width:'+pct+'%"></div></div></div>';
                     }).join('');
             } else {
                 sumEl.innerHTML = '';
             }
 
-            // 細項預算
             const entries = [];
             for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
                 subs.forEach(sub => {
@@ -630,20 +616,19 @@
                 });
             }
             const el = document.getElementById('bg-list');
-            if (!entries.length) { el.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">尚未設定預算</div>'; return; }
+            if (!entries.length) { el.innerHTML = '<div class="text-sm text-slate-500 text-center py-4">尚未設定預算</div>'; return; }
             el.innerHTML = entries.map(({main, sub, key, budget, used}) => {
                 const pct = Math.min(100, Math.round((used/budget)*100));
                 const remain = budget - used;
                 const barColor = pct >= 100 ? 'bg-rose-500' : pct >= 80 ? 'bg-amber-500' : 'bg-emerald-500';
-                return '<div class="bg-slate-50 rounded-lg p-2.5">'
-                    + '<div class="flex justify-between text-[11px] mb-1"><span class="font-medium text-slate-700">'+esc(main)+' > '+esc(sub)+'</span><span class="text-slate-400">$'+used.toLocaleString()+' / $'+budget.toLocaleString()+'</span></div>'
-                    + '<div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden mb-1"><div class="h-full '+barColor+' rounded-full transition-all" style="width:'+pct+'%"></div></div>'
-                    + '<div class="flex justify-between text-[10px]"><span class="'+(pct>=100?'text-rose-500':'text-slate-400')+'">'+pct+'%</span><span class="font-medium '+(remain>=0?'text-emerald-600':'text-rose-500')+'">剩 $'+remain.toLocaleString()+'</span></div></div>';
+                return '<div class="bg-slate-700/30 rounded-xl p-3 border border-slate-700/30">'
+                    + '<div class="flex justify-between text-sm mb-1.5"><span class="font-medium text-slate-300">'+esc(main)+' > '+esc(sub)+'</span><span class="text-slate-400">$'+used.toLocaleString()+' / $'+budget.toLocaleString()+'</span></div>'
+                    + '<div class="w-full h-2.5 bg-slate-700/50 rounded-full overflow-hidden mb-1.5"><div class="h-full '+barColor+' rounded-full transition-all" style="width:'+pct+'%"></div></div>'
+                    + '<div class="flex justify-between text-xs"><span class="'+(pct>=100?'text-rose-400':'text-slate-400')+'">'+pct+'%</span><span class="font-medium '+(remain>=0?'text-emerald-400':'text-rose-400')+'">剩 $'+remain.toLocaleString()+'</span></div></div>';
             }).join('');
         }
 
         function editAllBudgets() {
-            const m = document.getElementById('bg-month').value || currentMonth();
             _budgetEditType = 'expense';
             renderBudgetTabs();
             renderBudgetForm('飲食');
@@ -652,20 +637,18 @@
         function renderBudgetTabs() {
             const mains = getMainCats('expense');
             const el = document.getElementById('modal-budget-tabs');
-            el.innerHTML = mains.map(m => '<button onclick="renderBudgetForm(\''+escAttr(m)+'\')" class="touch-btn px-2.5 py-1.5 rounded-lg text-[10px] font-medium border '+(m==='飲食'?'bg-indigo-100 text-indigo-600 border-indigo-200':'bg-slate-50 text-slate-500 border-slate-200')+' whitespace-nowrap">'+esc(m)+'</button>').join('');
+            el.innerHTML = mains.map((m,i) => '<button onclick="renderBudgetForm(\''+escAttr(m)+'\')" class="touch-btn px-3 py-2 rounded-xl text-sm font-medium border '+(i===0?'bg-cyan-900/40 text-cyan-400 border-cyan-700/40':'bg-slate-700/30 text-slate-400 border-slate-700/30')+' whitespace-nowrap transition">'+esc(m)+'</button>').join('');
         }
         function renderBudgetForm(main) {
-            _budgetEditType = 'expense';
-            // highlight tab
             document.querySelectorAll('#modal-budget-tabs button').forEach(b => {
-                b.className = 'touch-btn px-2.5 py-1.5 rounded-lg text-[10px] font-medium border '+(b.textContent===main?'bg-indigo-100 text-indigo-600 border-indigo-200':'bg-slate-50 text-slate-500 border-slate-200')+' whitespace-nowrap';
+                b.className = 'touch-btn px-3 py-2 rounded-xl text-sm font-medium border '+(b.textContent===main?'bg-cyan-900/40 text-cyan-400 border-cyan-700/40':'bg-slate-700/30 text-slate-400 border-slate-700/30')+' whitespace-nowrap transition';
             });
             const subs = getSubCats('expense', main);
             const el = document.getElementById('modal-budget-form');
-            el.innerHTML = '<div class="text-[11px] font-bold text-slate-500 mb-1">'+esc(main)+'</div>'
+            el.innerHTML = '<div class="text-sm font-bold text-cyan-400 mb-2">'+esc(main)+'</div>'
                 + subs.map(sub => {
                     const key = catPath(main, sub);
-                    return '<div class="flex items-center space-x-2"><span class="text-[11px] text-slate-500 w-20 shrink-0 truncate">'+esc(sub)+'</span><input type="number" id="mb-'+escAttr(key)+'" value="'+(budgets[key]||'')+'" placeholder="0" inputmode="numeric" class="flex-1 px-2.5 py-2 rounded-lg border border-slate-200 text-xs text-right outline-none"></div>';
+                    return '<div class="flex items-center space-x-3"><span class="text-sm text-slate-300 w-24 shrink-0 truncate">'+esc(sub)+'</span><input type="number" id="mb-'+escAttr(key)+'" value="'+(budgets[key]||'')+'" placeholder="0" inputmode="numeric" class="flex-1 px-4 py-3 rounded-xl border border-slate-700/50 bg-slate-900/60 text-sm text-right text-slate-200 outline-none focus:ring-2 focus:ring-cyan-500/50"></div>';
                 }).join('');
         }
         async function saveAllBudgets() {
@@ -694,12 +677,12 @@
             document.getElementById('d-count').textContent = f.length;
 
             const recentEl = document.getElementById('d-recent');
-            if (!f.length) { recentEl.innerHTML = '<div class="py-4">📭 尚無紀錄</div>'; }
+            if (!f.length) { recentEl.innerHTML = '<div class="py-4 text-slate-500">📭 尚無紀錄</div>'; }
             else {
-                let html = '<div class="space-y-0.5 max-h-48 overflow-y-auto no-scrollbar">';
+                let html = '<div class="space-y-1 max-h-48 overflow-y-auto no-scrollbar">';
                 f.sort((a,b) => (b.date + b.id).localeCompare(a.date + a.id)).slice(0, 8).forEach(t => {
-                    const s = t.amount >= 0 ? 'text-emerald-600' : 'text-rose-500';
-                    html += '<div class="flex justify-between items-center px-2 py-1.5 border-b border-slate-50"><div class="flex items-center space-x-1.5 min-w-0"><span>'+(t.amount>=0?'📈':'📉')+'</span><span class="text-xs truncate">'+displayCat(t.category)+'</span><span class="text-[9px] text-slate-400 shrink-0">'+t.date.slice(5)+'</span></div><span class="text-xs font-bold '+s+' shrink-0">'+(t.amount>0?'+':'')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
+                    const s = t.amount >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                    html += '<div class="flex justify-between items-center px-3 py-2.5 border-b border-slate-700/30"><div class="flex items-center space-x-2 min-w-0"><span class="text-base">'+(t.amount>=0?'📈':'📉')+'</span><span class="text-sm text-slate-200 truncate">'+displayCat(t.category)+'</span><span class="text-xs text-slate-500 shrink-0">'+t.date.slice(5)+'</span></div><span class="text-sm font-bold '+s+' shrink-0">'+(t.amount>0?'+':'')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
                 });
                 html += '</div>';
                 recentEl.innerHTML = html;
@@ -721,13 +704,13 @@
             if (trendChart) trendChart.destroy();
             trendChart = new Chart(ctx, {
                 type: 'bar', data: { labels, datasets: [
-                    { label: '收入', data: incomes, backgroundColor: '#10b981', borderRadius: 6, barPercentage: .7 },
-                    { label: '支出', data: expenses, backgroundColor: '#f43f5e', borderRadius: 6, barPercentage: .7 }
+                    { label: '收入', data: incomes, backgroundColor: '#34d399', borderRadius: 6, barPercentage: .7 },
+                    { label: '支出', data: expenses, backgroundColor: '#fb7185', borderRadius: 6, barPercentage: .7 }
                 ]},
                 options: { responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 8, font: { size: 9 } } } },
-                    scales: { y: { beginAtZero: true, ticks: { font: { size: 9 }, callback: v => v >= 1000 ? (v/1000)+'k' : v } },
-                              x: { ticks: { font: { size: 8 } } } } }
+                    color: '#94a3b8', plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 10, font: { size: 11 }, color: '#94a3b8' } } },
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(71,85,105,.3)' }, ticks: { font: { size: 10 }, color: '#94a3b8', callback: v => v >= 1000 ? (v/1000)+'k' : v } },
+                              x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#94a3b8' } } } }
             });
         }
         function drawCategoryChart() {
@@ -735,18 +718,14 @@
             const m = currentMonth();
             const f = transactions.filter(t => t.date && t.date.startsWith(m) && t.amount < 0);
             const map = {};
-            f.forEach(t => {
-                const main = splitCat(t.category).main || '其他';
-                if (!map[main]) map[main] = 0;
-                map[main] += Math.abs(t.amount);
-            });
+            f.forEach(t => { const main = splitCat(t.category).main || '其他'; if (!map[main]) map[main] = 0; map[main] += Math.abs(t.amount); });
             const sorted = Object.entries(map).sort((a,b) => b[1] - a[1]);
-            const colors = ['#6366f1','#f43f5e','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16','#06b6d4','#a855f7','#e11d48','#d946ef','#0ea5e9','#65a30d'];
+            const colors = ['#6366f1','#f43f5e','#f59e0b','#34d399','#38bdf8','#a78bfa','#f472b6','#2dd4bf','#fb923c','#a3e635','#22d3ee','#c084fc','#f87171','#e879f9','#38bdf8','#84cc16'];
             if (catChart) catChart.destroy();
             catChart = new Chart(ctx, {
-                type: 'doughnut', data: { labels: sorted.map(([c]) => c), datasets: [{ data: sorted.map(([,v]) => v), backgroundColor: colors.slice(0, sorted.length), borderWidth: 0 }] },
+                type: 'doughnut', data: { labels: sorted.map(([c]) => c), datasets: [{ data: sorted.map(([,v]) => v), backgroundColor: colors.slice(0, sorted.length), borderWidth: 2, borderColor: '#1e293b' }] },
                 options: { responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, padding: 6, font: { size: 8 } } } },
+                    color: '#94a3b8', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 8, font: { size: 10 }, color: '#94a3b8' } } },
                     cutout: '55%' }
             });
         }
@@ -760,26 +739,25 @@
             const totalInc = inc.reduce((s,t) => s + t.amount, 0);
             const totalExp = exp.reduce((s,t) => s + Math.abs(t.amount), 0);
 
-            // 大類彙總（用 main cat）
             const incMap = {}, expMap = {};
             inc.forEach(t => { const main = splitCat(t.category).main || '其他'; if (!incMap[main]) incMap[main] = 0; incMap[main] += t.amount; });
             exp.forEach(t => { const main = splitCat(t.category).main || '其他'; if (!expMap[main]) expMap[main] = 0; expMap[main] += Math.abs(t.amount); });
 
-            let html = '<div class="space-y-1.5">';
-            html += '<div class="flex justify-between text-[11px] font-bold text-emerald-600 border-b pb-1"><span>收入</span><span>$'+totalInc.toLocaleString()+'</span></div>';
-            Object.entries(incMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += '<div class="flex justify-between text-[11px]"><span>'+esc(c)+'</span><span class="text-emerald-600">+$'+v.toLocaleString()+'</span></div>'; });
-            html += '<div class="flex justify-between text-[11px] font-bold text-rose-500 border-b pb-1 mt-2"><span>支出</span><span>$'+totalExp.toLocaleString()+'</span></div>';
-            Object.entries(expMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += '<div class="flex justify-between text-[11px]"><span>'+esc(c)+'</span><span class="text-rose-500">-$'+v.toLocaleString()+'</span></div>'; });
-            html += '<div class="flex justify-between text-[11px] font-bold text-indigo-600 border-t pt-1 mt-2"><span>結餘</span><span>'+(totalInc-totalExp >= 0 ? '+' : '')+'$'+(totalInc-totalExp).toLocaleString()+'</span></div>';
+            let html = '<div class="space-y-2">';
+            html += '<div class="flex justify-between text-sm font-bold text-emerald-400 border-b border-slate-700/30 pb-2 mb-1"><span>收入</span><span>$'+totalInc.toLocaleString()+'</span></div>';
+            Object.entries(incMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += '<div class="flex justify-between text-sm"><span class="text-slate-300">'+esc(c)+'</span><span class="text-emerald-400">+$'+v.toLocaleString()+'</span></div>'; });
+            html += '<div class="flex justify-between text-sm font-bold text-rose-400 border-b border-slate-700/30 pb-2 mb-1 mt-3"><span>支出</span><span>$'+totalExp.toLocaleString()+'</span></div>';
+            Object.entries(expMap).sort((a,b) => b[1] - a[1]).forEach(([c, v]) => { html += '<div class="flex justify-between text-sm"><span class="text-slate-300">'+esc(c)+'</span><span class="text-rose-400">-$'+v.toLocaleString()+'</span></div>'; });
+            html += '<div class="flex justify-between text-sm font-bold text-cyan-400 border-t border-slate-700/30 pt-2 mt-3"><span>結餘</span><span>'+(totalInc-totalExp >= 0 ? '+' : '')+'$'+(totalInc-totalExp).toLocaleString()+'</span></div>';
             html += '</div>';
             document.getElementById('r-summary').innerHTML = html;
 
             const detEl = document.getElementById('r-detail');
-            if (!f.length) { detEl.innerHTML = '<div class="py-4">📭 本月無紀錄</div>'; }
+            if (!f.length) { detEl.innerHTML = '<div class="py-4 text-slate-500">📭 本月無紀錄</div>'; }
             else {
-                let html2 = '<div class="space-y-0.5 max-h-48 overflow-y-auto no-scrollbar">';
+                let html2 = '<div class="space-y-1 max-h-48 overflow-y-auto no-scrollbar">';
                 f.sort((a,b) => (b.date + b.id).localeCompare(a.date + a.id)).forEach(t => {
-                    html2 += '<div class="flex justify-between items-center px-2 py-1 border-b border-slate-50"><span class="text-[10px] text-slate-400 w-12">'+t.date.slice(5)+'</span><span class="text-xs flex-1 min-w-0 truncate px-1">'+displayCat(t.category)+'</span><span class="text-xs font-bold '+(t.amount>=0?'text-emerald-600':'text-rose-500')+' shrink-0">'+(t.amount>0?'+':'')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
+                    html2 += '<div class="flex justify-between items-center px-3 py-2 border-b border-slate-700/30"><span class="text-xs text-slate-500 w-14">'+t.date.slice(5)+'</span><span class="text-sm flex-1 min-w-0 truncate px-2 text-slate-200">'+displayCat(t.category)+'</span><span class="text-sm font-bold '+(t.amount>=0?'text-emerald-400':'text-rose-400')+' shrink-0">'+(t.amount>0?'+':'')+'$'+Math.abs(t.amount).toLocaleString()+'</span></div>';
                 });
                 html2 += '</div>';
                 detEl.innerHTML = html2;
@@ -794,13 +772,13 @@
             if (reportChart) reportChart.destroy();
             reportChart = new Chart(ctx, {
                 type: 'bar', data: { labels, datasets: [
-                    { label: '收入', data: incData, backgroundColor: '#10b981', borderRadius: 4, barPercentage: .7 },
-                    { label: '支出', data: expData, backgroundColor: '#f43f5e', borderRadius: 4, barPercentage: .7 }
+                    { label: '收入', data: incData, backgroundColor: '#34d399', borderRadius: 4, barPercentage: .7 },
+                    { label: '支出', data: expData, backgroundColor: '#fb7185', borderRadius: 4, barPercentage: .7 }
                 ]},
                 options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 6, font: { size: 9 } } } },
-                    scales: { x: { ticks: { font: { size: 8 }, callback: v => v >= 1000 ? (v/1000)+'k' : v } },
-                              y: { ticks: { font: { size: 8 } } } } }
+                    color: '#94a3b8', plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 8, font: { size: 11 }, color: '#94a3b8' } } },
+                    scales: { x: { grid: { color: 'rgba(71,85,105,.3)' }, ticks: { font: { size: 10 }, color: '#94a3b8', callback: v => v >= 1000 ? (v/1000)+'k' : v } },
+                              y: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8' } } } }
             });
         }
 
@@ -812,28 +790,26 @@
             } catch(_) {}
         }
         function renderSettingsCats() {
-            // 收入
             document.getElementById('s-income-main').innerHTML = Object.entries(CATEGORIES.income).map(([main, subs]) =>
-                '<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">'
-                + '<div class="flex items-center justify-between mb-1.5">'
-                + '<span class="text-sm font-bold text-emerald-700">'+esc(main)+'</span>'
-                + '<div class="flex space-x-1.5">'
-                + '<button onclick="openSubCats(\'income\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded-lg font-medium active:bg-indigo-200">✏️ 細項</button>'
-                + '<button onclick="removeMainCat(\'income\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-rose-100 text-rose-500 rounded-lg font-medium active:bg-rose-200">🗑️</button>'
+                '<div class="bg-slate-700/30 rounded-xl p-4 border border-slate-700/30">'
+                + '<div class="flex items-center justify-between mb-2">'
+                + '<span class="text-base font-bold text-emerald-400">'+esc(main)+'</span>'
+                + '<div class="flex space-x-2">'
+                + '<button onclick="openSubCats(\'income\',\''+escAttr(main)+'\')" class="touch-btn text-sm px-3 py-1.5 bg-cyan-900/40 text-cyan-400 rounded-xl font-medium border border-cyan-700/30 active:bg-cyan-800/50 transition">✏️ 細項</button>'
+                + '<button onclick="removeMainCat(\'income\',\''+escAttr(main)+'\')" class="touch-btn text-sm px-3 py-1.5 bg-rose-900/40 text-rose-400 rounded-xl font-medium border border-rose-700/30 active:bg-rose-800/50 transition">🗑️</button>'
                 + '</div></div>'
-                + '<div class="flex flex-wrap gap-1.5">'+subs.map(s => '<span class="text-sm px-2 py-1 bg-white rounded-lg border border-slate-200 text-slate-600">'+esc(s)+'</span>').join('')+'</div></div>'
+                + '<div class="flex flex-wrap gap-2">'+subs.map(s => '<span class="text-sm px-3 py-1.5 bg-slate-800/80 rounded-xl border border-slate-700/50 text-slate-300">'+esc(s)+'</span>').join('')+'</div></div>'
             ).join('');
 
-            // 支出
             document.getElementById('s-expense-main').innerHTML = Object.entries(CATEGORIES.expense).map(([main, subs]) =>
-                '<div class="bg-slate-50 rounded-xl p-3 border border-slate-100">'
-                + '<div class="flex items-center justify-between mb-1.5">'
-                + '<span class="text-sm font-bold text-rose-700">'+esc(main)+'</span>'
-                + '<div class="flex space-x-1.5">'
-                + '<button onclick="openSubCats(\'expense\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-indigo-100 text-indigo-600 rounded-lg font-medium active:bg-indigo-200">✏️ 細項</button>'
-                + '<button onclick="removeMainCat(\'expense\',\''+escAttr(main)+'\')" class="touch-btn text-xs px-2 py-1 bg-rose-100 text-rose-500 rounded-lg font-medium active:bg-rose-200">🗑️</button>'
+                '<div class="bg-slate-700/30 rounded-xl p-4 border border-slate-700/30">'
+                + '<div class="flex items-center justify-between mb-2">'
+                + '<span class="text-base font-bold text-rose-400">'+esc(main)+'</span>'
+                + '<div class="flex space-x-2">'
+                + '<button onclick="openSubCats(\'expense\',\''+escAttr(main)+'\')" class="touch-btn text-sm px-3 py-1.5 bg-cyan-900/40 text-cyan-400 rounded-xl font-medium border border-cyan-700/30 active:bg-cyan-800/50 transition">✏️ 細項</button>'
+                + '<button onclick="removeMainCat(\'expense\',\''+escAttr(main)+'\')" class="touch-btn text-sm px-3 py-1.5 bg-rose-900/40 text-rose-400 rounded-xl font-medium border border-rose-700/30 active:bg-rose-800/50 transition">🗑️</button>'
                 + '</div></div>'
-                + '<div class="flex flex-wrap gap-1.5">'+subs.map(s => '<span class="text-sm px-2 py-1 bg-white rounded-lg border border-slate-200 text-slate-600">'+esc(s)+'</span>').join('')+'</div></div>'
+                + '<div class="flex flex-wrap gap-2">'+subs.map(s => '<span class="text-sm px-3 py-1.5 bg-slate-800/80 rounded-xl border border-slate-700/50 text-slate-300">'+esc(s)+'</span>').join('')+'</div></div>'
             ).join('');
         }
         function addMainCat(type) {
@@ -866,9 +842,9 @@
         function renderSubCatList() {
             const subs = getSubCats(_subCatType, _subCatMain);
             document.getElementById('modal-subcats-list').innerHTML = subs.map((s, i) =>
-                '<div class="flex items-center justify-between bg-slate-50 rounded-xl px-3 py-2.5 border border-slate-100">'
-                + '<input type="text" id="subcat-input-'+i+'" value="'+escAttr(s)+'" class="flex-1 text-sm bg-transparent outline-none border-none text-slate-700 focus:font-medium" onchange="renameSubCat('+i+')">'
-                + '<button onclick="removeSubCat('+i+')" class="touch-btn text-sm px-2 py-1 bg-rose-100 text-rose-500 rounded-lg font-medium active:bg-rose-200 shrink-0 ml-2">✕</button></div>'
+                '<div class="flex items-center justify-between bg-slate-700/30 rounded-xl px-4 py-3 border border-slate-700/30">'
+                + '<input type="text" id="subcat-input-'+i+'" value="'+escAttr(s)+'" class="flex-1 text-sm bg-transparent outline-none border-none text-slate-200 focus:font-medium" onchange="renameSubCat('+i+')">'
+                + '<button onclick="removeSubCat('+i+')" class="touch-btn text-sm px-3 py-1.5 bg-rose-900/40 text-rose-400 rounded-xl font-medium border border-rose-700/30 active:bg-rose-800/50 shrink-0 ml-2 transition">✕</button></div>'
             ).join('');
         }
         function renameSubCat(idx) {
@@ -910,7 +886,6 @@
             CATEGORIES = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
             saveCats();
             renderSettingsCats();
-            // 也更新記帳頁的分類選單
             renderTxCats();
             showToast('✅ 已還原為預設分類');
         }
@@ -994,17 +969,14 @@
         // ====== 自動渲染 ======
         function renderAll() { renderDashboard(); renderTxTable(); renderBudgets(); renderReport(); }
 
-        // ====== 🤖 AI 智慧記帳（多筆 + 語音 + OCR） ======
+        // ====== 🤖 AI 智慧記帳 ======
         let _aiResults = [];
-        let _confirmedCount = 0;
-
         async function parseAIInput() {
             const raw = document.getElementById('ai-input').value.trim();
             if (!raw) { showToast('請輸入或說話'); return; }
             _aiResults = await aiParseMulti(raw);
             renderAIPreview();
         }
-
         async function aiParseMulti(text) {
             const segments = [];
             const regex = /([\\u4e00-\\u9fff\\w\\s]+?)\\s*[\\$¥]?\\s*(\\d[\\d,]*\\.?\\d*)\\s*(k|千|萬|百)?/gi;
@@ -1019,22 +991,15 @@
                 if (!name) name = '項目';
                 segments.push({ name, amount });
             }
-
             if (segments.length === 0) {
                 const single = await aiParseSingle(text);
                 if (single) segments.push(single);
             }
-
-            // 用 AI 或規則分類
             const geminiKey = localStorage.getItem('famt_gemini_key');
             for (const seg of segments) {
-                const classified = geminiKey
-                    ? await classifyWithGemini(seg.name, geminiKey)
-                    : classifyByRule(seg.name);
-                if (classified) {
-                    seg.type = classified.type;
-                    seg.category = classified.category;
-                } else {
+                const classified = geminiKey ? await classifyWithGemini(seg.name, geminiKey) : classifyByRule(seg.name);
+                if (classified) { seg.type = classified.type; seg.category = classified.category; }
+                else {
                     seg.type = seg.amount < 0 || text.includes('支出') ? 'expense' : (seg.amount > 5000 ? 'income' : 'expense');
                     const { main, sub } = seg.type === 'income' ? { main:'其他收入', sub:'其他收入' } : { main:'其他', sub:'雜費' };
                     seg.category = catPath(main, sub);
@@ -1042,37 +1007,20 @@
             }
             return segments;
         }
-
         async function aiParseSingle(text) {
             const trimmed = text.replace(/^[\\s,，]+/, '').replace(/[\\s,，]+$/, '').trim();
             if (!trimmed) return null;
-
-            // 試著從結尾抓數字
             const m = trimmed.match(/^(.+?)\\s*(\\d[\\.\\d]*)$/);
-            if (m) {
-                const name = m[1].trim();
-                const amount = parseFloat(m[2]);
-                return { name, amount };
-            }
-            return null;
+            return m ? { name: m[1].trim(), amount: parseFloat(m[2]) } : null;
         }
-
-        /** 關鍵字規則分類（兩階版） */
         function classifyByRule(name) {
             const kw = name.toLowerCase();
-            // 先試收入關鍵字
             for (const [main, subs] of Object.entries(CATEGORIES.income)) {
-                for (const sub of subs) {
-                    if (kw.includes(sub)) return { type: 'income', category: catPath(main, sub) };
-                }
+                for (const sub of subs) { if (kw.includes(sub)) return { type: 'income', category: catPath(main, sub) }; }
             }
-            // 再試支出
             for (const [main, subs] of Object.entries(CATEGORIES.expense)) {
-                for (const sub of subs) {
-                    if (kw.includes(sub)) return { type: 'expense', category: catPath(main, sub) };
-                }
+                for (const sub of subs) { if (kw.includes(sub)) return { type: 'expense', category: catPath(main, sub) }; }
             }
-            // 特殊規則
             if (/薪水|薪資|薪|月薪|工資/.test(kw)) return { type: 'income', category: catPath('工作收入', '薪資') };
             if (/獎金|年終/.test(kw)) return { type: 'income', category: catPath('獎金', '年終獎金') };
             if (/外食|餐廳|便當|麵|飯|餐|小吃|早午餐|晚餐|午餐|早餐|宵夜/.test(kw)) return { type: 'expense', category: catPath('飲食', '外食') };
@@ -1093,30 +1041,22 @@
             if (/醫療|醫院|診所|藥/.test(kw)) return { type: 'expense', category: catPath('醫療', '健保醫療') };
             if (/娛樂|電影|遊戲|Netflix/.test(kw)) return { type: 'expense', category: catPath('休閒與社交', '休閒娛樂') };
             if (/捐款|公益/.test(kw)) return { type: 'expense', category: catPath('休閒與社交', '捐款') };
-
             return null;
         }
-
-        /** Gemini AI 分類（兩階版） */
         async function classifyWithGemini(name, apiKey) {
             const incomeDesc = Object.entries(CATEGORIES.income).map(([m, subs]) => m + '：' + subs.join('、')).join('；');
             const expenseDesc = Object.entries(CATEGORIES.expense).map(([m, subs]) => m + '：' + subs.join('、')).join('；');
             const prompt = '你是一個家庭記帳分類助手。請判斷「'+name+'」是收入還是支出，並從以下兩階分類中選出最適合的「大類/細項」。\\n\\n收入分類：'+incomeDesc+'\\n\\n支出分類：'+expenseDesc+'\\n\\n請只回傳 JSON，格式：{"type":"income/expense","main":"大類","sub":"細項"}';
-
             const models = [
                 localStorage.getItem('famt_gemini_model') || 'gemini-2.5-flash-lite',
-                'gemini-2.5-flash-lite',
-                'gemma-4-31b-it',
-                'gemini-2.5-flash'
+                'gemini-2.5-flash-lite', 'gemma-4-31b-it', 'gemini-2.5-flash'
             ];
             const tried = new Set();
             for (const model of models) {
-                if (tried.has(model)) continue;
-                tried.add(model);
+                if (tried.has(model)) continue; tried.add(model);
                 try {
                     const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent?key='+apiKey, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.1, maxOutputTokens: 200 } })
                     });
                     if (!r.ok) continue;
@@ -1133,36 +1073,30 @@
             }
             return null;
         }
-
         function renderAIPreview() {
             const el = document.getElementById('ai-preview');
             if (!_aiResults.length) { el.classList.add('hidden'); return; }
             el.classList.remove('hidden');
-            let html = '<div class="text-[10px] font-bold text-indigo-600 mb-1.5">📋 預覽（勾選要送出的項目）</div>';
+            let html = '<div class="text-sm font-bold text-cyan-400 mb-2">📋 預覽（勾選要送出的項目）</div>';
             _aiResults.forEach((r, i) => {
                 const isIncome = r.type === 'income' || r.amount > 0;
-                html += '<label class="flex items-center space-x-2 bg-white rounded-lg px-2.5 py-2 border border-slate-100 active:bg-slate-50">'
-                    + '<input type="checkbox" checked id="ai-chk-'+i+'" class="accent-indigo-600 shrink-0">'
+                html += '<label class="flex items-center space-x-3 bg-slate-800/80 rounded-xl px-4 py-3 border border-slate-700/30 active:bg-slate-700/30 transition">'
+                    + '<input type="checkbox" checked id="ai-chk-'+i+'" class="accent-cyan-500 shrink-0 w-5 h-5">'
                     + '<div class="flex-1 min-w-0">'
-                    + '<div class="flex items-center space-x-1">'
-                    + '<span class="text-xs font-medium truncate">'+esc(r.name)+'</span>';
-                if (r.source === 'ai') html += '<span class="text-[9px] px-1 py-0.5 rounded bg-purple-100 text-purple-600">🤖AI</span>';
-                else html += '<span class="text-[9px] px-1 py-0.5 rounded bg-slate-100 text-slate-500">📖規則</span>';
-                html += '</div>'
-                    + '<p class="text-[10px] text-slate-500">'+displayCat(r.category)+' · '+(isIncome ? '💵收入' : '💸支出')+'</p></div>'
-                    + '<span class="text-xs font-bold '+(isIncome?'text-emerald-600':'text-rose-500')+' shrink-0">'+(isIncome?'+':'')+'$'+Math.abs(r.amount).toLocaleString()+'</span></label>';
+                    + '<div class="flex items-center space-x-2">'
+                    + '<span class="text-sm font-medium text-slate-200 truncate">'+esc(r.name)+'</span>'
+                    + (r.source === 'ai' ? '<span class="text-xs px-2 py-0.5 rounded-lg bg-purple-900/40 text-purple-400 border border-purple-700/30">🤖AI</span>' : '<span class="text-xs px-2 py-0.5 rounded-lg bg-slate-700/50 text-slate-400 border border-slate-600/30">📖規則</span>')
+                    + '</div><p class="text-xs text-slate-400 mt-0.5">'+displayCat(r.category)+' · '+(isIncome?'💵收入':'💸支出')+'</p></div>'
+                    + '<span class="text-sm font-bold '+(isIncome?'text-emerald-400':'text-rose-400')+' shrink-0">'+(isIncome?'+':'')+'$'+Math.abs(r.amount).toLocaleString()+'</span></label>';
             });
-            html += '<button onclick="confirmCheckedAI()" class="touch-btn w-full py-2 rounded-lg font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm active:scale-[0.98] transition">✅ 送出勾選項目</button>';
+            html += '<button onclick="confirmCheckedAI()" class="touch-btn w-full py-3 rounded-xl font-bold text-sm text-white bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-500/20 active:scale-[0.97] transition">✅ 送出勾選項目</button>';
             el.innerHTML = html;
         }
-
         function clearAI() {
             document.getElementById('ai-preview').classList.add('hidden');
             document.getElementById('ai-input').value = '';
             _aiResults = [];
-            _confirmedCount = 0;
         }
-
         async function confirmCheckedAI() {
             const checked = Array.from(document.querySelectorAll('[id^="ai-chk-"]:checked'));
             if (!checked.length) { showToast('⚠️ 請勾選要送出的項目'); return; }
@@ -1172,13 +1106,7 @@
             for (const r of valid) {
                 try {
                     const isIncome = r.type === 'income' || r.amount > 0;
-                    await apiPost('/api/transactions', {
-                        date: today(),
-                        type: isIncome ? 'income' : 'expense',
-                        category: r.category,
-                        amount: r.amount,
-                        note: r.name
-                    });
+                    await apiPost('/api/transactions', { date: today(), type: isIncome ? 'income' : 'expense', category: r.category, amount: r.amount, note: r.name });
                     ok++;
                 } catch(e) { fail++; }
             }
@@ -1195,17 +1123,14 @@
             if (!SpeechRecognition) { showToast('⚠️ 此瀏覽器不支援語音'); return; }
             if (_aiRecognition && _aiRecognition._running) { _aiRecognition.stop(); return; }
             const rec = new SpeechRecognition();
-            rec.lang = 'zh-TW';
-            rec.continuous = false;
-            rec.interimResults = true;
+            rec.lang = 'zh-TW'; rec.continuous = false; rec.interimResults = true;
             rec.onresult = ev => {
                 let text = '';
                 for (let i = ev.resultIndex; i < ev.results.length; i++) text += ev.results[i][0].transcript;
                 document.getElementById('ai-input').value = text;
             };
             rec.onend = () => { rec._running = false; };
-            rec._running = true;
-            rec.start();
+            rec._running = true; rec.start();
         }
 
         // ====== 📷 OCR ======
@@ -1213,15 +1138,9 @@
             const file = input.files[0]; if (!file) return;
             document.getElementById('ai-ocr-loading').classList.remove('hidden');
             try {
-                if (typeof Tesseract === 'undefined') {
-                    showToast('⚠️ OCR 引擎尚未載入');
-                    document.getElementById('ai-ocr-loading').classList.add('hidden');
-                    return;
-                }
+                if (typeof Tesseract === 'undefined') { showToast('⚠️ OCR 引擎尚未載入'); document.getElementById('ai-ocr-loading').classList.add('hidden'); return; }
                 const { data: { text } } = await Tesseract.recognize(file, 'chi_tra', { logger: m => {
-                    if (m.status === 'recognizing text') {
-                        document.getElementById('ai-ocr-loading').textContent = '🔍 OCR 辨識中 ' + Math.round(m.progress * 100) + '%';
-                    }
+                    if (m.status === 'recognizing text') document.getElementById('ai-ocr-loading').textContent = '🔍 OCR 辨識中 ' + Math.round(m.progress * 100) + '%';
                 }});
                 document.getElementById('ai-input').value = text.trim();
                 showToast('✅ OCR 完成');
@@ -1235,51 +1154,31 @@
         function loadGeminiKey() {
             const key = localStorage.getItem('famt_gemini_key');
             const statusEl = document.getElementById('ai-status');
-            if (key) {
-                statusEl.textContent = '✅ AI 已啟用';
-                statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-600';
-            } else {
-                statusEl.textContent = '未啟用';
-                statusEl.className = 'text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 text-slate-500';
-            }
+            if (key) { statusEl.textContent = '✅ AI 已啟用'; statusEl.className = 'text-sm font-bold px-3 py-1.5 rounded-xl bg-emerald-900/40 text-emerald-400 border border-emerald-700/30'; }
+            else { statusEl.textContent = '未啟用'; statusEl.className = 'text-sm font-bold px-3 py-1.5 rounded-xl bg-slate-700/50 text-slate-400'; }
             document.getElementById('s-gemini-key').value = key || '';
         }
         function saveGeminiKey() {
             const key = document.getElementById('s-gemini-key').value.trim();
             if (!key) { showToast('請輸入 API Key'); return; }
-            localStorage.setItem('famt_gemini_key', key);
-            loadGeminiKey();
-            showToast('✅ AI 分類已啟用！');
+            localStorage.setItem('famt_gemini_key', key); loadGeminiKey(); showToast('✅ AI 分類已啟用！');
         }
         function clearGeminiKey() {
-            localStorage.removeItem('famt_gemini_key');
-            loadGeminiKey();
-            showToast('已關閉 AI 分類');
+            localStorage.removeItem('famt_gemini_key'); loadGeminiKey(); showToast('已關閉 AI 分類');
         }
         async function testGeminiKey() {
             const key = document.getElementById('s-gemini-key').value.trim();
             if (!key) { showToast('請先輸入 API Key'); return; }
             const statusEl = document.getElementById('ai-status-detail');
-            statusEl.classList.remove('hidden');
-            statusEl.textContent = '⏳ 測試中...';
+            statusEl.classList.remove('hidden'); statusEl.textContent = '⏳ 測試中...';
             try {
                 const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key='+key, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: '回傳OK' }] }], generationConfig: { maxOutputTokens: 5 } })
                 });
-                if (res.ok) {
-                    statusEl.textContent = '';
-                    statusEl.classList.add('hidden');
-                    showToast('✅ 連線成功！（gemini-2.5-flash-lite）');
-                } else {
-                    const err = await res.json();
-                    statusEl.textContent = '❌ ' + (err?.error?.message || 'HTTP ' + res.status);
-                    statusEl.className = 'text-[10px] text-rose-600 bg-rose-50 rounded-lg px-2.5 py-2 leading-relaxed break-words';
-                }
-            } catch(e) {
-                statusEl.textContent = '❌ ' + e.message;
-            }
+                if (res.ok) { statusEl.textContent = ''; statusEl.classList.add('hidden'); showToast('✅ 連線成功！（gemini-2.5-flash-lite）'); }
+                else { const err = await res.json(); statusEl.textContent = '❌ ' + (err?.error?.message || 'HTTP ' + res.status); statusEl.className = 'text-sm text-rose-400 bg-rose-900/30 rounded-xl px-4 py-3 leading-relaxed break-words border border-rose-700/20'; }
+            } catch(e) { statusEl.textContent = '❌ ' + e.message; }
         }
     </script>
 </body>
