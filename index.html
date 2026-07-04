@@ -298,6 +298,7 @@
         };
         const BUDGET_CATS = ['餐飲/外食','日常採買','交通','居住/水電','娛樂','醫療','教育','通訊','保險','其他支出'];
         let transactions = [], budgets = {}, txType = 'expense', editingId = null;
+        let _lastSyncVersion = null, _syncTimer = null, _isSyncing = false;
         let trendChart = null, catChart = null, reportChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -310,7 +311,48 @@
             loadGeminiKey();
             loadFromCloud();
             updateDateBadge();
+            startAutoSync();
         });
+
+        /** 自動同步：每 30 秒檢查雲端版號，有變動就自動重新載入 */
+        async function checkSync() {
+            if (_isSyncing) return;
+            _isSyncing = true;
+            try {
+                const r = await apiGet('/api/sync-version');
+                if (!r.success) return;
+                if (_lastSyncVersion === null) {
+                    _lastSyncVersion = r.version;
+                    return;
+                }
+                if (r.version !== _lastSyncVersion) {
+                    _lastSyncVersion = r.version;
+                    const currentTab = document.querySelector('.tab-content.active')?.id?.replace('content-', '') || 'dashboard';
+                    await loadFromCloud();
+                    // 重新整理當前頁籤
+                    switchTab(currentTab);
+                    showSyncBadge('🔄');
+                    setTimeout(() => showSyncBadge('☁️'), 3000);
+                }
+            } catch(_) {
+                // 離線時安靜忽略
+            } finally {
+                _isSyncing = false;
+            }
+        }
+
+        function startAutoSync() {
+            if (_syncTimer) clearInterval(_syncTimer);
+            _syncTimer = setInterval(checkSync, 30000);
+        }
+
+        function showSyncBadge(icon) {
+            document.getElementById('sync-icon').textContent = icon;
+        }
+
+        function stopAutoSync() {
+            if (_syncTimer) { clearInterval(_syncTimer); _syncTimer = null; }
+        }
 
         function today() { const d = new Date(); return d.toISOString().split('T')[0]; }
         function currentMonth() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
@@ -359,6 +401,8 @@
                 showToast('⚠️ 離線模式');
             }
             await loadBudgets();
+            // 同步載入後更新版號記錄
+            try { const v = await apiGet('/api/sync-version'); if (v.success) _lastSyncVersion = v.version; } catch(_) {}
             renderAll();
         }
 
