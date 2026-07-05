@@ -393,8 +393,8 @@
         }
         .app-header {
             height: 56px;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
+            background: rgba(23, 182, 177, 0.06);
+            border-bottom: 1px solid rgba(23, 182, 177, 0.12);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -402,6 +402,41 @@
             position: sticky;
             top: 0;
             z-index: 20;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .app-header .header-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+        .app-header #page-title {
+            font-size: 1.0625rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .app-header #date-badge {
+            font-size: .8125rem;
+            font-weight: 500;
+        }
+        .app-header .sync-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: background .15s;
+        }
+        .app-header .sync-btn:hover {
+            background: rgba(23, 182, 177, 0.1);
+        }
+        .app-header .sync-btn .sync-icon {
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+        .app-header .sync-label {
+            font-size: .75rem;
         }
         .app-content {
             flex: 1;
@@ -419,9 +454,11 @@
             left: 0;
             right: 0;
             z-index: 30;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border);
+            background: rgba(23, 182, 177, 0.06);
+            border-top: 1px solid rgba(23, 182, 177, 0.12);
             padding: 4px 0 env(safe-area-inset-bottom, 4px);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
         .mobile-nav-btn {
             flex: 1;
@@ -529,7 +566,7 @@
                 <div class="flex items-center gap-3">
                     <!-- Logo on mobile (hidden desktop) -->
                     <a href="#" class="lg:hidden flex items-center gap-2 no-underline" onclick="switchTab('dashboard');return false">
-                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="header-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="16" cy="16" r="14.5" stroke="#1a5ee5" stroke-width="2.5"/>
                             <path d="M9 17V22C9 22.5523 9.44772 23 10 23H14V19H18V23H22C22.5523 23 23 22.5523 23 22V17" stroke="#1a5ee5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M7 16L16 9L25 16" stroke="#1a5ee5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -539,14 +576,14 @@
                         </svg>
                         <span class="text-sm font-bold text-slate-800 tracking-tight">FinaFlow</span>
                     </a>
-                    <h2 id="page-title" class="text-sm font-semibold text-slate-900">儀表板</h2>
-                    <span id="date-badge" class="text-xs text-slate-400 font-medium"></span>
+                    <h2 id="page-title">儀表板</h2>
+                    <span id="date-badge"></span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span id="ai-status-badge" class="badge badge-neutral hidden lg:inline-flex">AI</span>
-                    <button onclick="manualSync()" class="btn btn-ghost btn-sm gap-1.5">
-                        <span id="sync-icon">☁️</span>
-                        <span id="sync-label" class="hidden sm:inline">已連線</span>
+                    <button onclick="manualSync()" class="sync-btn gap-1">
+                        <span id="sync-icon" class="sync-icon">☁️</span>
+                        <span id="sync-label" class="sync-label hidden sm:inline">已連線</span>
                     </button>
                 </div>
             </header>
@@ -849,6 +886,11 @@
         const API_BASE = (() => {
             const saved = localStorage.getItem('famt_api_base');
             if (saved) return saved;
+            // When served via tunnel/backend (same origin), use relative path
+            const host = window.location.hostname;
+            if (host === 'localhost' || host.endsWith('trycloudflare.com') || host.endsWith('ngrok.io') || host.endsWith('loca.lt')) {
+                return '';
+            }
             return 'https://invision-first-mall-nose.trycloudflare.com';
         })();
 

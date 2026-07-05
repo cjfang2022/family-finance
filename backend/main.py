@@ -8,13 +8,19 @@ import json
 from datetime import datetime
 from typing import Optional
 
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 import gspread
 
 # ====== 設定 ======
+# Serve static frontend files
+STATIC_DIR = Path(__file__).resolve().parent.parent  # backend/ → project root (where index.html lives)
+
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -30,6 +36,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve index.html so the tunnel shows the app directly
+@app.get("/")
+def serve_frontend():
+    return FileResponse(str(STATIC_DIR / "index.html"), media_type="text/html")
 
 SHEET = None  # lazy init
 
