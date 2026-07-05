@@ -9,27 +9,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* ===== Design Tokens ===== */
+        /* ===== Design Tokens — Wallet Inspired ===== */
         :root {
             /* Background */
-            --bg-page: #f1f5f9;
+            --bg-page: #f0f4f8;
             --bg-card: #ffffff;
-            --bg-sidebar: #0f172a;
-            --bg-subtle: #f8fafc;
-            --bg-hover: #f1f5f9;
-            --bg-active: #e2e8f0;
-            /* Brand */
-            --brand: #2563eb;
-            --brand-hover: #1d4ed8;
-            --brand-light: #eff6ff;
-            --brand-text: #1e40af;
-            --brand-ring: rgba(37,99,235,.2);
+            --bg-sidebar: #0a3622;
+            --bg-subtle: #f7fafc;
+            --bg-hover: #f0fdf4;
+            --bg-active: #dcfce7;
+            /* Brand — Deep Green */
+            --brand: #16a34a;
+            --brand-hover: #15803d;
+            --brand-light: #f0fdf4;
+            --brand-text: #166534;
+            --brand-ring: rgba(22,163,74,.2);
             /* Text */
-            --text: #1e293b;
+            --text: #1a202c;
             --text-secondary: #64748b;
             --text-muted: #94a3b8;
             --text-heading: #0f172a;
-            --text-inverse: #f1f5f9;
+            --text-inverse: #f0fdf4;
             /* Semantic */
             --success: #059669;
             --success-light: #f0fdf4;
@@ -43,15 +43,15 @@
             --border: #e2e8f0;
             --border-light: #f1f5f9;
             /* Shadow */
-            --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.04);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 8px rgba(0,0,0,.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,.1);
             /* Radius */
             --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --radius-xl: 16px;
-            /* Spacing */
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+            /* Spacing — more breathing room */
             --space-xs: 4px;
             --space-sm: 8px;
             --space-md: 12px;
@@ -59,6 +59,7 @@
             --space-xl: 20px;
             --space-2xl: 24px;
             --space-3xl: 32px;
+            --space-4xl: 40px;
             /* Typography */
             font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
             --font-mono: 'SF Mono', 'JetBrains Mono', ui-monospace, monospace;
@@ -399,7 +400,7 @@
         .app-content {
             flex: 1;
             padding: var(--space-3xl);
-            max-width: 1280px;
+            max-width: 1024px;
             width: 100%;
             margin: 0 auto;
         }
@@ -463,15 +464,15 @@
         <aside class="app-sidebar">
             <div class="px-5 py-5 border-b border-slate-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">F</div>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">W</div>
                     <div>
-                        <div class="text-sm font-bold text-white tracking-tight">FinaFlow</div>
-                        <div class="text-[10px] text-slate-500 font-medium">家庭財務管理</div>
+                        <div class="text-sm font-bold text-white tracking-tight">Wallet</div>
+                        <div class="text-[11px] text-emerald-300/70 font-medium">家庭記帳</div>
                     </div>
                 </div>
             </div>
             <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-                <button onclick="switchTab('dashboard')" id="sb-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 bg-blue-600/20 text-blue-400">
+                <button onclick="switchTab('dashboard')" id="sb-dashboard" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 bg-emerald-600/20 text-emerald-400">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                     <span>儀表板</span>
                 </button>
@@ -493,7 +494,7 @@
                 </button>
             </nav>
             <div class="px-4 py-4 border-t border-slate-800">
-                <button onclick="manualSync()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition-all">
+                <button onclick="manualSync()" class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs text-slate-500 hover:text-emerald-400 hover:bg-slate-800/60 transition-all">
                     <span class="flex items-center gap-2">
                         <span id="sync-icon-side" class="text-xs">⏳</span>
                         <span id="sync-label-side">連線中</span>
@@ -530,8 +531,8 @@
                     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="stat-card"><div class="stat-label">本月收入</div><div id="d-income" class="stat-value" style="color:var(--income)">$0</div></div>
                         <div class="stat-card"><div class="stat-label">本月支出</div><div id="d-expense" class="stat-value" style="color:var(--expense)">$0</div></div>
-                        <div class="stat-card"><div class="stat-label">本月結餘</div><div id="d-balance" class="stat-value" style="color:var(--text-heading)">$0</div></div>
-                        <div class="stat-card"><div class="stat-label">總筆數</div><div id="d-count" class="stat-value" style="color:var(--text-heading)">0</div></div>
+                        <div class="stat-card"><div class="stat-label">結餘</div><div id="d-balance" class="stat-value" style="color:var(--text-heading)">$0</div></div>
+                        <div class="stat-card"><div class="stat-label">筆數</div><div id="d-count" class="stat-value" style="color:var(--text-heading)">0</div></div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -554,7 +555,7 @@
                 <section id="content-transactions" class="tab-content space-y-5 animate-in">
 
                     <!-- AI Input -->
-                    <div class="card" style="background:#f8faff;border-color:#bfdbfe">
+                    <div class="card" style="background:#f0fdf4;border-color:#bbf7d0">
                         <div class="card-body space-y-3">
                             <div class="flex items-center gap-2"><span class="text-lg">🤖</span><span class="text-sm font-semibold text-slate-900">AI 智慧記帳</span></div>
                             <p class="text-xs text-slate-500">輸入文字、按 🎤 說話、或 📷 拍照，自動分類！例如「牛排120 水果50 高鐵1490」</p>
@@ -622,9 +623,9 @@
                                 <input type="month" id="bg-month" class="select" style="width:auto" onchange="loadBudgets()">
                             </div>
                             <div class="grid grid-cols-3 gap-4">
-                                <div class="stat-card"><div class="stat-label">預算總額</div><div id="bg-total" class="stat-value" style="font-size:1.125rem">$0</div></div>
-                                <div class="stat-card"><div class="stat-label">已花費</div><div id="bg-spent" class="stat-value" style="font-size:1.125rem;color:var(--expense)">$0</div></div>
-                                <div class="stat-card"><div class="stat-label">剩餘</div><div id="bg-remain" class="stat-value" style="font-size:1.125rem;color:var(--success)">$0</div></div>
+                                <div class="stat-card"><div class="stat-label">預算總額</div><div id="bg-total" class="stat-value" style="font-size:1.25rem;color:var(--text-heading)">$0</div></div>
+                                <div class="stat-card"><div class="stat-label">已花費</div><div id="bg-spent" class="stat-value" style="font-size:1.25rem;color:var(--expense)">$0</div></div>
+                                <div class="stat-card"><div class="stat-label">剩餘</div><div id="bg-remain" class="stat-value" style="font-size:1.25rem;color:var(--success)">$0</div></div>
                             </div>
                             <div id="bg-summary" class="space-y-2"></div>
                             <div id="bg-list" class="space-y-2"></div>
@@ -930,7 +931,7 @@
                 document.querySelectorAll('[id^="'+prefix+'"]').forEach(el => el.classList.remove('active','bg-blue-600/20','text-blue-400'));
                 const el = document.getElementById(prefix + t);
                 if (el) {
-                    if (prefix === 'sb-') { el.classList.add('bg-blue-600/20','text-blue-400'); }
+                    if (prefix === 'sb-') { el.classList.add('bg-emerald-600/20','text-emerald-400'); }
                     else if (prefix === 'mb-') { el.classList.add('active'); }
                 }
             });
@@ -1140,7 +1141,7 @@
             for (let i=5;i>=0;i--) { const d=new Date(); d.setMonth(d.getMonth()-i); const m=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); labels.push(monthLabel(m)); const f=transactions.filter(t=>t.date&&t.date.startsWith(m)); incomes.push(f.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0)); expenses.push(f.filter(t=>t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0)); }
             if (trendChart) trendChart.destroy();
             trendChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[
-                { label:'收入', data:incomes, backgroundColor:'#059669', borderRadius:4, barPercentage:.6 },
+                { label:'收入', data:incomes, backgroundColor:'#16a34a', borderRadius:4, barPercentage:.6 },
                 { label:'支出', data:expenses, backgroundColor:'#dc2626', borderRadius:4, barPercentage:.6 }
             ]}, options:{ responsive:true, maintainAspectRatio:false,
                 color:'#64748b', plugins:{ legend:{ position:'top', labels:{ boxWidth:10, padding:8, font:{ size:11 }, color:'#64748b' } } },
@@ -1155,7 +1156,7 @@
             const map={};
             f.forEach(t=>{ const main=splitCat(t.category).main||'其他'; if(!map[main]) map[main]=0; map[main]+=Math.abs(t.amount); });
             const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]);
-            const colors=['#2563eb','#059669','#dc2626','#d97706','#7c3aed','#0891b2','#db2777','#65a30d','#ea580c','#4f46e5'];
+            const colors=['#16a34a','#059669','#dc2626','#d97706','#7c3aed','#0891b2','#db2777','#65a30d','#ea580c','#4f46e5'];
             if (catChart) catChart.destroy();
             catChart = new Chart(ctx, { type:'doughnut', data:{ labels:sorted.map(([c])=>c), datasets:[{ data:sorted.map(([,v])=>v), backgroundColor:colors.slice(0,sorted.length), borderWidth:2, borderColor:'#fff' }] },
                 options:{ responsive:true, maintainAspectRatio:false,
@@ -1192,7 +1193,7 @@
             const labels=[...new Set([...Object.keys(im),...Object.keys(em)])];
             if (reportChart) reportChart.destroy();
             reportChart = new Chart(ctx, { type:'bar', data:{ labels, datasets:[
-                { label:'收入', data:labels.map(c=>im[c]||0), backgroundColor:'#059669', borderRadius:4, barPercentage:.7 },
+                { label:'收入', data:labels.map(c=>im[c]||0), backgroundColor:'#16a34a', borderRadius:4, barPercentage:.7 },
                 { label:'支出', data:labels.map(c=>em[c]||0), backgroundColor:'#dc2626', borderRadius:4, barPercentage:.7 }
             ]}, options:{ responsive:true, maintainAspectRatio:false, indexAxis:'y',
                 color:'#64748b', plugins:{ legend:{ position:'top', labels:{ boxWidth:10, padding:8, font:{ size:11 }, color:'#64748b' } } },
