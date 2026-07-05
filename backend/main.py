@@ -8,11 +8,13 @@ import json
 from datetime import datetime
 from typing import Optional
 
+import os
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import gspread
@@ -37,7 +39,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve index.html so the tunnel shows the app directly
+# Serve static assets (icon.png, etc.)
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+# Serve index.html at root
 @app.get("/")
 def serve_frontend():
     return FileResponse(str(STATIC_DIR / "index.html"), media_type="text/html")

@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="/static/icon.png" type="image/png">
     <style>
         /* ===== Design Tokens — Blue Enterprise (Logo-Inspired) ===== */
         :root {
@@ -507,18 +508,7 @@
         <aside class="app-sidebar">
             <div class="px-5 py-5 border-b border-blue-900/30">
                 <a href="#" class="flex items-center gap-3 no-underline" onclick="switchTab('dashboard');return false">
-                    <!-- Logo SVG: House + Bar Chart + Ring -->
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Outer ring -->
-                        <circle cx="16" cy="16" r="14.5" stroke="#1a5ee5" stroke-width="2.5"/>
-                        <!-- House -->
-                        <path d="M9 17V22C9 22.5523 9.44772 23 10 23H14V19H18V23H22C22.5523 23 23 22.5523 23 22V17" stroke="#1a5ee5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M7 16L16 9L25 16" stroke="#1a5ee5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                        <!-- Bar chart inside house -->
-                        <rect x="13.5" y="14" width="2" height="4" rx="0.5" fill="#17b6b1"/>
-                        <rect x="16.5" y="12" width="2" height="6" rx="0.5" fill="#1a5ee5"/>
-                        <rect x="19.5" y="15" width="2" height="3" rx="0.5" fill="#17b6b1"/>
-                    </svg>
+                    <img src="/static/icon.png" alt="FinaFlow" class="w-8 h-8">
                     <div>
                         <div class="text-sm font-bold text-white tracking-tight">FinaFlow</div>
                         <div class="text-[11px] text-blue-300/60 font-medium">家庭財務</div>
@@ -566,14 +556,7 @@
                 <div class="flex items-center gap-3">
                     <!-- Logo on mobile (hidden desktop) -->
                     <a href="#" class="lg:hidden flex items-center gap-2 no-underline" onclick="switchTab('dashboard');return false">
-                        <svg class="header-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="16" cy="16" r="14.5" stroke="#1a5ee5" stroke-width="2.5"/>
-                            <path d="M9 17V22C9 22.5523 9.44772 23 10 23H14V19H18V23H22C22.5523 23 23 22.5523 23 22V17" stroke="#1a5ee5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M7 16L16 9L25 16" stroke="#1a5ee5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-                            <rect x="13.5" y="14" width="2" height="4" rx="0.5" fill="#17b6b1"/>
-                            <rect x="16.5" y="12" width="2" height="6" rx="0.5" fill="#1a5ee5"/>
-                            <rect x="19.5" y="15" width="2" height="3" rx="0.5" fill="#17b6b1"/>
-                        </svg>
+                        <img src="/static/icon.png" alt="FinaFlow" class="header-icon">
                         <span class="text-sm font-bold text-slate-800 tracking-tight">FinaFlow</span>
                     </a>
                     <h2 id="page-title">儀表板</h2>
