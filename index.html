@@ -128,10 +128,10 @@
             justify-content: center;
             gap: var(--space-sm);
             font-weight: 600;
-            font-size: .8125rem;
+            font-size: .875rem;
             line-height: 1;
-            padding: 0 var(--space-lg);
-            height: 36px;
+            padding: 0 var(--space-xl);
+            height: 40px;
             border-radius: var(--radius-md);
             border: 1px solid transparent;
             cursor: pointer;
@@ -151,16 +151,16 @@
         .btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--brand-ring); }
         .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
         .btn-danger:hover { background: #b91c1c; }
-        .btn-sm { height: 32px; padding: 0 var(--space-md); font-size: .75rem; }
-        .btn-lg { height: 44px; padding: 0 var(--space-xl); font-size: .875rem; }
+        .btn-sm { height: 36px; padding: 0 var(--space-lg); font-size: .8125rem; }
+        .btn-lg { height: 48px; padding: 0 var(--space-2xl); font-size: .9375rem; }
 
         /* ===== Component: Input ===== */
         .input {
             display: block;
             width: 100%;
-            padding: 0 var(--space-md);
-            height: 36px;
-            font-size: .8125rem;
+            padding: 0 var(--space-lg);
+            height: 40px;
+            font-size: .875rem;
             line-height: 1;
             color: var(--text);
             background: #fff;
@@ -176,16 +176,16 @@
         .input::placeholder { color: var(--text-muted); }
         .input-error { border-color: var(--danger); }
         .input-error:focus { box-shadow: 0 0 0 3px rgba(220,38,38,.2); }
-        .input-sm { height: 32px; font-size: .75rem; }
-        .input-lg { height: 44px; font-size: .875rem; }
+        .input-sm { height: 36px; font-size: .8125rem; }
+        .input-lg { height: 48px; font-size: .9375rem; }
 
         /* ===== Component: Select ===== */
         .select {
             display: block;
             width: 100%;
-            padding: 0 var(--space-md);
-            height: 36px;
-            font-size: .8125rem;
+            padding: 0 var(--space-lg);
+            height: 40px;
+            font-size: .875rem;
             color: var(--text);
             background: #fff;
             border: 1px solid var(--border);
@@ -207,7 +207,7 @@
             font-size: .8125rem;
             font-weight: 500;
             color: var(--text-secondary);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         /* ===== Component: Card ===== */
@@ -256,10 +256,10 @@
             box-shadow: var(--shadow-sm);
         }
         .stat-card .stat-label {
-            font-size: .75rem;
+            font-size: .8125rem;
             font-weight: 500;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
         .stat-card .stat-value {
             font-size: 1.5rem;
@@ -278,7 +278,7 @@
         .table-wrap table {
             width: 100%;
             border-collapse: collapse;
-            font-size: .8125rem;
+            font-size: .875rem;
         }
         .table-wrap thead {
             position: sticky;
@@ -287,8 +287,8 @@
         }
         .table-wrap th {
             background: var(--bg-subtle);
-            padding: 10px var(--space-lg);
-            font-size: .6875rem;
+            padding: 12px var(--space-lg);
+            font-size: .75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: .04em;
@@ -299,7 +299,7 @@
         }
         .table-wrap th.num { text-align: right; }
         .table-wrap td {
-            padding: 10px var(--space-lg);
+            padding: 12px var(--space-lg);
             border-bottom: 1px solid var(--border-light);
             color: var(--text);
             vertical-align: middle;
@@ -386,7 +386,7 @@
             min-height: 100vh;
         }
         .app-header {
-            height: 56px;
+            height: 60px;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -422,8 +422,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 6px 0;
-            font-size: .625rem;
+            padding: 8px 0;
+            font-size: .6875rem;
             font-weight: 500;
             color: var(--text-muted);
             border: none;
@@ -433,7 +433,7 @@
             gap: 2px;
         }
         .mobile-nav-btn.active { color: var(--brand); }
-        .mobile-nav-btn .icon { font-size: 1.125rem; }
+        .mobile-nav-btn .icon { font-size: 1.25rem; }
 
         /* Responsive */
         @media (max-width: 1023px) {
