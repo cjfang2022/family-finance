@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>綠色 Sidebar 挑選</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+            background: #f1faf9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+        h1 { font-size: 1.125rem; font-weight: 700; color: #0f1728; margin-bottom: 4px; }
+        .subtitle { font-size: 0.8125rem; color: #64748b; margin-bottom: 20px; text-align: center; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 560px;
+        }
+        @media (min-width: 760px) {
+            .grid { grid-template-columns: 1fr 1fr; max-width: 900px; }
+        }
+        .card {
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease;
+            border: 2px solid transparent;
+        }
+        .card:active { transform: scale(.97); }
+        /* Real app layout: sidebar + content */
+        .app-preview {
+            display: flex;
+            height: 220px;
+        }
+        .card-sidebar {
+            width: 150px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .card-content {
+            flex: 1;
+            background: #f1faf9;
+            display: flex;
+            flex-direction: column;
+            padding: 14px;
+        }
+        .preview-header {
+            height: 36px;
+            background: rgba(23,182,177,.06);
+            border-bottom: 1px solid rgba(23,182,177,.12);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            margin: -14px -14px 10px -14px;
+            border-radius: 0;
+        }
+        .preview-header .h-dot {
+            width: 24px; height: 24px;
+            border-radius: 6px;
+        }
+        .preview-header .h-bar {
+            height: 10px;
+            width: 60px;
+            border-radius: 4px;
+        }
+        .preview-header .h-bar2 {
+            height: 10px;
+            width: 40px;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+        .content-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .content-row {
+            display: flex; gap: 8px;
+        }
+        .content-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+            flex: 1;
+            height: 36px;
+        }
+        .content-box.tall { height: 48px; }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 12px 10px;
+            border-bottom: 1px solid;
+        }
+        .sidebar-logo .sl-icon {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+        .sidebar-logo .sl-text { display: flex; flex-direction: column; gap: 2px; }
+        .sidebar-logo .sl-name { font-size: 13px; font-weight: 700; letter-spacing: -.01em; }
+        .sidebar-logo .sl-sub { font-size: 10px; font-weight: 500; }
+        .sidebar-nav {
+            padding: 8px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+        .sn-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all .12s;
+        }
+        .sn-item .sn-dot {
+            width: 12px; height: 12px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        .sidebar-sync {
+            padding: 8px 10px;
+            border-top: 1px solid;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+        .color-info {
+            padding: 10px 14px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+        }
+        .color-label { display: flex; flex-direction: column; gap: 1px; }
+        .color-hex {
+            font-size: 12px; font-weight: 600;
+            font-family: 'SF Mono', 'JetBrains Mono', monospace;
+            color: #0f1728;
+        }
+        .color-desc { font-size: 10px; color: #94a3b8; }
+        .color-sample {
+            width: 24px; height: 24px;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        .selected-badge {
+            font-size: 9px;
+            background: #16a34a;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 5px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .group-label {
+            grid-column: 1 / -1;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f1728;
+            padding: 8px 0 2px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 4px;
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f1728;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0,0,0,.2);
+            opacity: 0;
+            transition: opacity .25s;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌿 綠色 Sidebar 挑選</h1>
+    <p class="subtitle">點選喜歡的，告訴我編號或色碼</p>
+    <div id="toast" class="toast-msg"></div>
+    <div class="grid" id="colorGrid"></div>
+
+    <script>
+        const colors = [
+            // Deep forest
+            { hex: '#0d3320', name: '墨綠' },
+            { hex: '#143d28', name: '森林綠' },
+            { hex: '#1a4a32', name: '深翠綠' },
+            { hex: '#1f5a3a', name: '松柏綠' },
+            // Mid-tone
+            { hex: '#256a42', name: '葉綠' },
+            { hex: '#2d7a4e', name: '青草綠' },
+            { hex: '#358a56', name: '翠綠' },
+            // Teal-ward
+            { hex: '#1e6b5e', name: '墨青' },
+            { hex: '#267a6c', name: '青碧' },
+            { hex: '#2f8a7a', name: '碧綠' },
+            // Sage / muted
+            { hex: '#3d6b52', name: '鼠尾綠' },
+            { hex: '#4a7a5e', name: '灰橄欖' },
+            { hex: '#588a6a', name: '淺灰綠' },
+            { hex: '#669a76', name: '淡灰綠' },
+            // Light
+            { hex: '#3b824b', name: '草綠' },
+            { hex: '#46915b', name: '亮綠' },
+            { hex: '#52a16a', name: '淺亮綠' },
+        ];
+
+        const grid = document.getElementById('colorGrid');
+        const navItems = ['儀表板', '記帳', '預算'];
+
+        function isDark(hex) {
+            const v = parseInt(hex.slice(1), 16);
+            const r = (v >> 16) & 0xff, g = (v >> 8) & 0xff, b = v & 0xff;
+            return (r * 0.299 + g * 0.587 + b * 0.114) < 155;
+        }
+
+        function tc(bg) {
+            const d = isDark(bg);
+            return {
+                normal: d ? 'rgba(255,255,255,.72)' : '#334155',
+                active: d ? '#ffffff' : '#0f1728',
+                hover: d ? 'rgba(255,255,255,.08)' : 'rgba(15,23,42,.06)',
+                activeBg: d ? 'rgba(255,255,255,.14)' : 'rgba(15,23,42,.09)',
+                logo: d ? '#ffffff' : '#0f1728',
+                sub: d ? 'rgba(255,255,255,.6)' : '#475569',
+                sync: d ? 'rgba(255,255,255,.55)' : '#64748b',
+                syncAccent: d ? 'rgba(255,255,255,.85)' : '#0f1728',
+                border: d ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.06)',
+                headerBar: d ? 'rgba(255,255,255,.15)' : 'rgba(0,0,0,.08)',
+                headerBar2: d ? 'rgba(255,255,255,.1)' : 'rgba(0,0,0,.05)',
+            };
+        }
+
+        const groups = [
+            { label: '🌲 深色系', range: [0,3] },
+            { label: '🌿 中色系', range: [4,6] },
+            { label: '🧊 青綠色系', range: [7,9] },
+            { label: '🌱 灰綠色系', range: [10,13] },
+            { label: '☀️ 亮色系', range: [14,16] },
+        ];
+
+        groups.forEach(g => {
+            const label = document.createElement('div');
+            label.className = 'group-label';
+            label.textContent = g.label;
+            grid.appendChild(label);
+
+            for (let i = g.range[0]; i <= g.range[1]; i++) {
+                const c = colors[i];
+                const t = tc(c.hex);
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.hex = c.hex;
+
+                const app = document.createElement('div');
+                app.className = 'app-preview';
+
+                // Sidebar
+                const side = document.createElement('div');
+                side.className = 'card-sidebar';
+                side.style.background = c.hex;
+
+                side.innerHTML = `
+                    <div class="sidebar-logo" style="border-bottom-color:${t.border}">
+                        <div class="sl-icon"><img src="/static/icon.png" alt="" style="width:28px;height:28px;border-radius:6px;filter:drop-shadow(0 0 4px rgba(26,94,229,.3)) brightness(1.15)"></div>
+                        <div class="sl-text">
+                            <div class="sl-name" style="color:${t.logo}">FinaFlow</div>
+                            <div class="sl-sub" style="color:${t.sub}">家庭財務</div>
+                        </div>
+                    </div>
+                    <div class="sidebar-nav">
+                        ${navItems.map((item, idx) => `
+                            <div class="sn-item" style="color:${idx===0 ? t.active : t.normal};background:${idx===0 ? t.activeBg : 'transparent'};font-weight:${idx===0 ? 600 : 500}">
+                                <div class="sn-dot" style="background:${idx===0 ? t.active : t.normal}"></div>
+                                <span>${item}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="sidebar-sync" style="color:${t.sync};border-top-color:${t.border}">
+                        <span>☁️ 已連線</span>
+                        <span style="color:${t.syncAccent}">同步</span>
+                    </div>
+                `;
+
+                // Content area
+                const content = document.createElement('div');
+                content.className = 'card-content';
+                content.innerHTML = `
+                    <div class="preview-header">
+                        <div class="h-dot" style="background:${t.headerBar}"></div>
+                        <div class="h-bar" style="background:${t.headerBar}"></div>
+                        <div class="h-bar2" style="background:${t.headerBar2}"></div>
+                    </div>
+                    <div class="content-cards">
+                        <div class="content-row">
+                            <div class="content-box"></div>
+                            <div class="content-box"></div>
+                        </div>
+                        <div class="content-box tall"></div>
+                        <div class="content-row">
+                            <div class="content-box" style="height:60px"></div>
+                            <div class="content-box" style="height:60px"></div>
+                        </div>
+                    </div>
+                `;
+
+                app.appendChild(side);
+                app.appendChild(content);
+
+                // Info bar
+                const info = document.createElement('div');
+                info.className = 'color-info';
+                info.innerHTML = `
+                    <div class="color-label">
+                        <div class="color-hex">${c.hex} · ${c.name}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span class="color-desc">${isDark(c.hex) ? '白字' : '深色字'}</span>
+                        <div class="color-sample" style="background:${c.hex}"></div>
+                    </div>
+                `;
+
+                card.appendChild(app);
+                card.appendChild(info);
+                grid.appendChild(card);
+
+                card.onclick = () => {
+                    document.querySelectorAll('.card').forEach(el => el.style.borderColor = 'transparent');
+                    card.style.borderColor = '#16a34a';
+                    document.querySelectorAll('.selected-badge').forEach(b => b.remove());
+                    const badge = document.createElement('span');
+                    badge.className = 'selected-badge';
+                    badge.textContent = '✅';
+                    info.querySelector('.color-label').appendChild(badge);
+                    const toast = document.getElementById('toast');
+                    toast.textContent = `✦ 選了「${c.name}」(${c.hex}) — 告訴豆豆！`;
+                    toast.style.opacity = '1';
+                    clearTimeout(toast._t);
+                    toast._t = setTimeout(() => toast.style.opacity = '0', 2000);
+                };
+            }
+        });
+    </script>
+</body>
+</html>

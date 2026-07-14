@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar 顏色挑選</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', 'Noto Sans TC', system-ui, sans-serif;
+            background: #f1faf9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+        h1 { font-size: 1.125rem; font-weight: 700; color: #0f1728; margin-bottom: 6px; }
+        .subtitle { font-size: 0.8125rem; color: #64748b; margin-bottom: 20px; }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            width: 100%;
+            max-width: 420px;
+        }
+        @media (min-width: 640px) {
+            .grid { grid-template-columns: 1fr 1fr; max-width: 640px; }
+        }
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,.08);
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+        .card:active { transform: scale(.97); }
+        .sidebar-preview {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 16px;
+            min-height: 200px;
+        }
+        .preview-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .preview-logo .icon-placeholder {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,.15);
+            border-radius: 8px;
+        }
+        .preview-logo .text-placeholder {
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        .preview-logo .brand-name {
+            font-size: 14px; font-weight: 700; color: #fff;
+            letter-spacing: -0.01em;
+        }
+        .preview-logo .brand-sub {
+            font-size: 11px; color: rgba(255,255,255,.6);
+        }
+        .preview-items {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .preview-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,.7);
+            transition: all .15s;
+        }
+        .preview-item.active {
+            background: rgba(255,255,255,.12);
+            color: #fff;
+        }
+        .preview-item .dot {
+            width: 14px; height: 14px;
+            border-radius: 4px;
+            background: rgba(255,255,255,.2);
+        }
+        .preview-item.active .dot { background: rgba(255,255,255,.4); }
+        .color-info {
+            padding: 12px 16px;
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f1f5f9;
+        }
+        .color-hex {
+            font-size: 13px; font-weight: 600;
+            font-family: 'SF Mono', 'JetBrains Mono', monospace;
+            color: #0f1728;
+        }
+        .color-desc {
+            font-size: 11px; color: #94a3b8;
+        }
+        .selected-badge {
+            font-size: 10px;
+            background: #1a5ee5;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Sidebar 顏色挑選</h1>
+    <p class="subtitle">點選你要的顏色，跟我說編號即可</p>
+    <div class="grid" id="colorGrid"></div>
+    <div style="margin-top:20px;font-size:12px;color:#94a3b8">
+        目前使用：<span id="currentBadge" style="font-weight:700">#142a45</span>
+    </div>
+
+    <script>
+        const colors = [
+            { hex: '#0c1e33', name: '深海軍藍', desc: 'Very dark' },
+            { hex: '#142a45', name: '深海藍', desc: '目前使用中' },
+            { hex: '#1a3355', name: '深藍', desc: '比目前淺一階' },
+            { hex: '#1f3d5e', name: '中深藍', desc: '' },
+            { hex: '#254a6b', name: '藍灰', desc: '' },
+            { hex: '#2b5678', name: '霧藍', desc: '' },
+            { hex: '#326385', name: '淺霧藍', desc: '' },
+            { hex: '#3b6f91', name: '淺藍灰', desc: '更明亮' },
+        ];
+
+        const currentColor = '#142a45';
+        const grid = document.getElementById('colorGrid');
+
+        const sidebarItems = ['儀表板', '記帳', '預算', '報表', '設定'];
+
+        colors.forEach(c => {
+            const isActive = c.hex === currentColor;
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => selectColor(c.hex, c.name);
+
+            const sidebar = document.createElement('div');
+            sidebar.className = 'sidebar-preview';
+            sidebar.style.background = c.hex;
+
+            sidebar.innerHTML = `
+                <div class="preview-logo">
+                    <div class="icon-placeholder"></div>
+                    <div class="text-placeholder">
+                        <div class="brand-name">FinaFlow</div>
+                        <div class="brand-sub">家庭財務</div>
+                    </div>
+                </div>
+                <div class="preview-items">
+                    ${sidebarItems.map((item, i) => `
+                        <div class="preview-item ${i === 0 ? 'active' : ''}">
+                            <div class="dot"></div>
+                            <span>${item}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            const info = document.createElement('div');
+            info.className = 'color-info';
+            info.innerHTML = `
+                <div>
+                    <div class="color-hex">${c.hex}</div>
+                    <div class="color-desc">${c.name}${c.desc ? ' · ' + c.desc : ''}</div>
+                </div>
+                ${isActive ? '<div class="selected-badge">目前</div>' : ''}
+            `;
+
+            card.appendChild(sidebar);
+            card.appendChild(info);
+            grid.appendChild(card);
+        });
+
+        function selectColor(hex, name) {
+            document.getElementById('currentBadge').textContent = hex;
+            // Highlight the selected card
+            document.querySelectorAll('.color-info .selected-badge').forEach(b => b.remove());
+            // We'll just update the badge text for feedback
+        }
+    </script>
+</body>
+</html>

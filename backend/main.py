@@ -30,6 +30,9 @@ SCOPES = [
 SHEET_KEY = os.environ.get("SHEET_KEY", "10257dP7ZcVqT5gIp8OPf-t78rJK8XyouXpxzjZY7AHQ")
 CRED_PATH = os.environ.get("CRED_PATH", "/etc/secrets/google_creds.json")
 
+# Chinese font for PDF export
+CJK_FONT = "/usr/share/fonts/truetype/arphic/uming.ttc"
+
 app = FastAPI(title="家庭收支小管家 API")
 
 app.add_middleware(
@@ -84,10 +87,15 @@ def ensure_sheets():
     sh = get_sheet()
     try:
         tx_sheet = sh.worksheet("收支紀錄")
+        # Ensure new column exists (migration for existing sheets)
+        try:
+            tx_sheet.update("H1", "支付方式")
+        except Exception:
+            pass
     except Exception:
-        tx_sheet = sh.add_worksheet("收支紀錄", 1000, 7)
-        tx_sheet.update("A1:G1", [["ID", "日期", "類別", "分類", "金額", "備註", "建立時間"]])
-        tx_sheet.format("A1:G1", {"textFormat": {"bold": True}})
+        tx_sheet = sh.add_worksheet("收支紀錄", 1000, 8)
+        tx_sheet.update("A1:H1", [["ID", "日期", "類別", "分類", "金額", "備註", "建立時間", "支付方式"]])
+        tx_sheet.format("A1:H1", {"textFormat": {"bold": True}})
 
     try:
         bg_sheet = sh.worksheet("預算設定")
@@ -107,6 +115,7 @@ class TransactionIn(BaseModel):
     category: str
     amount: float
     note: str = ""
+    pay_method: str = ""
 
 
 class TransactionUpdate(BaseModel):
@@ -116,6 +125,7 @@ class TransactionUpdate(BaseModel):
     category: Optional[str] = None
     amount: Optional[float] = None
     note: Optional[str] = None
+    pay_method: Optional[str] = None
 
 
 class TransactionDelete(BaseModel):
@@ -167,6 +177,7 @@ def get_transactions():
             "amount": float(row[4]) if row[4] else 0,
             "note": row[5] if len(row) > 5 else "",
             "createdAt": row[6] if len(row) > 6 else "",
+            "pay_method": row[7] if len(row) > 7 else "",
         })
 
     # 如果有缺 ID 或建立時間的列，寫回 Sheets 補上
@@ -189,7 +200,7 @@ def add_transaction(tx: TransactionIn):
     amount = tx.amount
 
     # Insert at row 2 (below header)
-    tx_sheet.insert_row([tx_id, tx.date, tx.type, tx.category, amount, tx.note, now], 2)
+    tx_sheet.insert_row([tx_id, tx.date, tx.type, tx.category, amount, tx.note, now, tx.pay_method], 2)
     return {"success": True, "id": tx_id}
 
 
@@ -211,12 +222,13 @@ def update_transaction(tx: TransactionUpdate):
 
     new_amount = tx.amount if tx.amount is not None else old_amount
 
-    tx_sheet.update(f"B{row_idx}:F{row_idx}", [[
+    tx_sheet.update(f"B{row_idx}:H{row_idx}", [[
         tx.date or rows[row_idx - 1][1],
         tx.type or rows[row_idx - 1][2],
         tx.category or rows[row_idx - 1][3],
         new_amount,
         tx.note if tx.note is not None else rows[row_idx - 1][5],
+        tx.pay_method if tx.pay_method is not None else rows[row_idx - 1][7] if len(rows[row_idx - 1]) > 7 else "",
     ]])
     return {"success": True}
 
@@ -357,3 +369,73 @@ def save_settings(settings: SettingsData):
             sheet.append_row([key, value])
 
     return {"success": True}
+
+
+# ====== PDF Export (server-side, no font issues) ======
+from fastapi.responses import StreamingResponse
+from fpdf import FPDF
+import io
+
+
+@app.get("/api/export/pdf/{month}")
+def export_pdf(month: str):
+    main_sheet, _ = ensure_sheets()
+    rows = main_sheet.get_all_values()
+    data_rows = rows[1:] if len(rows) > 1 else []
+
+    filtered = [r for r in data_rows if len(r) > 1 and r[1].startswith(month)]
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.add_font("CJK", "", CJK_FONT, uni=True)
+    pdf.set_font("CJK", "", 16)
+    pdf.cell(0, 10, f"收支報表 - {month}", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+    pdf.set_font("CJK", "", 10)
+
+    income_total = sum(float(r[4]) for r in filtered if len(r) > 4 and r[4] and float(r[4]) >= 0)
+    expense_total = sum(-float(r[4]) for r in filtered if len(r) > 4 and r[4] and float(r[4]) < 0)
+    balance = income_total - expense_total
+
+    pdf.cell(0, 7, f"收入：+${income_total:,.0f}", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 7, f"支出：-${expense_total:,.0f}", new_x="LMARGIN", new_y="NEXT")
+    bal_str = f"+${balance:,.0f}" if balance >= 0 else f"-${abs(balance):,.0f}"
+    pdf.cell(0, 7, f"結餘：{bal_str}", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+
+    col_w = [22, 26, 40, 28, 44, 30]
+    header_labels = ["日期", "類別", "分類", "金額", "備註", "支付方式"]
+
+    pdf.set_font("CJK", "", 9)
+    for i, h in enumerate(header_labels):
+        pdf.cell(col_w[i], 7, h, border=1, align="C")
+    pdf.ln()
+
+    for r in filtered:
+        date = r[1][5:] if len(r) > 1 and len(r[1]) >= 10 else (r[1] if len(r) > 1 else "")
+        typ = "收入" if len(r) > 4 and r[4] and float(r[4]) >= 0 else "支出"
+        cat = r[3] if len(r) > 3 else ""
+        amt_raw = float(r[4]) if len(r) > 4 and r[4] else 0
+        amt_str = f"+${amt_raw:,.0f}" if amt_raw >= 0 else f"-${abs(amt_raw):,.0f}"
+        note = r[5] if len(r) > 5 else ""
+        pay = r[7] if len(r) > 7 else ""
+        vals = [date, typ, cat, amt_str, note, pay]
+        for i, v in enumerate(vals):
+            pdf.cell(col_w[i], 7, v, border=1, align="C" if i in [0, 3] else "L")
+        pdf.ln()
+
+        if pdf.get_y() > 270:
+            pdf.add_page()
+            pdf.set_font("CJK", "", 9)
+            for i, h in enumerate(header_labels):
+                pdf.cell(col_w[i], 7, h, border=1, align="C")
+            pdf.ln()
+
+    buf = io.BytesIO()
+    pdf.output(buf)
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=report_{month}.pdf"}
+    )
